@@ -55,7 +55,7 @@ public final class TransformedObjectDeclaration {
   /**
    * the caches.
    */
-  private static final Map<Class<? extends TransformedObject>, TransformedObjectDeclaration> CACHES =
+  private static final Map<Class<?>, TransformedObjectDeclaration> CACHES =
     new ConcurrentHashMap<>();
 
   /**
@@ -74,7 +74,7 @@ public final class TransformedObjectDeclaration {
    * the object class.
    */
   @NotNull
-  private final Class<? extends TransformedObject> objectClass;
+  private final Class<?> objectClass;
 
   /**
    * creates a new transformed object declaration.
@@ -85,7 +85,7 @@ public final class TransformedObjectDeclaration {
    * @return a newly created transformed object declaration.
    */
   @NotNull
-  public static TransformedObjectDeclaration of(@NotNull final Class<? extends TransformedObject> cls,
+  public static TransformedObjectDeclaration of(@NotNull final Class<?> cls,
                                                 @Nullable final TransformedObject object) {
     return TransformedObjectDeclaration.CACHES.computeIfAbsent(cls, clazz -> {
       final var classOf = new ClassOf<>(clazz);
@@ -122,7 +122,7 @@ public final class TransformedObjectDeclaration {
    * @return a newly created transformed object declaration.
    */
   @NotNull
-  public static TransformedObjectDeclaration of(@NotNull final Class<? extends TransformedObject> cls) {
+  public static TransformedObjectDeclaration of(@NotNull final Class<?> cls) {
     return TransformedObjectDeclaration.of(cls, null);
   }
 }

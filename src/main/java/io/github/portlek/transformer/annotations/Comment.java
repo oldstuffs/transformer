@@ -44,5 +44,5 @@ public @interface Comment {
    * @return comments.
    */
   @NotNull
-  String[] value();
+  String @NotNull [] value();
 }

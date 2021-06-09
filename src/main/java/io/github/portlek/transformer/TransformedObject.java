@@ -34,13 +34,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -62,27 +65,16 @@ public abstract class TransformedObject {
   private TransformedObjectDeclaration declaration;
 
   /**
-   * the file.
+   * the path.
    */
   @Nullable
-  private File file;
+  private Path path;
 
   /**
    * the resolver.
    */
   @Nullable
   private TransformResolver resolver;
-
-  /**
-   * checks if the file exists or not.
-   *
-   * @param file the file to check.
-   *
-   * @return {@code true} if the file exists.
-   */
-  public static boolean exists(@NotNull final File file) {
-    return Files.exists(file.toPath());
-  }
 
   /**
    * get values as map.
@@ -93,6 +85,7 @@ public abstract class TransformedObject {
    * @return values as map.
    *
    * @throws TransformException if something goes wrong when getting the value as map.
+   * @throws NullPointerException if {@link #declaration} is null.
    */
   @NotNull
   public final Map<String, Object> asMap(@NotNull final TransformResolver resolver, final boolean conservative)
@@ -115,13 +108,164 @@ public abstract class TransformedObject {
   }
 
   /**
+   * creates the parent directory of {@link #path}.
+   *
+   * @return {@code this} for builder chain.
+   *
+   * @throws IOException if something goes wrong with I/O.
+   * @throws NullPointerException if {@link #path} is null.
+   */
+  @NotNull
+  public final TransformedObject createDirectory() throws IOException {
+    return this.createDirectory(this.getParent(Objects.requireNonNull(this.path, "path")));
+  }
+
+  /**
+   * creates the parent directory of the file.
+   *
+   * @param file the file to create.
+   *
+   * @return {@code this} for builder chain.
+   *
+   * @throws IOException if something goes wrong with I/O.
+   */
+  @NotNull
+  public final TransformedObject createDirectory(@NotNull final File file) throws IOException {
+    return this.createDirectory(file.toPath());
+  }
+
+  /**
+   * creates the parent directory of the path.
+   *
+   * @param path the path to create.
+   *
+   * @return {@code this} for builder chain.
+   *
+   * @throws IOException if something goes wrong with I/O.
+   */
+  @NotNull
+  public final TransformedObject createDirectory(@NotNull final Path path) throws IOException {
+    Files.createDirectory(path);
+    return this;
+  }
+
+  /**
+   * creates {@link #path}.
+   *
+   * @return {@code this} for builder chain.
+   *
+   * @throws IOException if something goes wrong with I/O.
+   * @throws NullPointerException if {@link #path} is null.
+   */
+  @NotNull
+  public final TransformedObject createFile() throws IOException {
+    return this.createFile(Objects.requireNonNull(this.path, "path"));
+  }
+
+  /**
+   * creates the file.
+   *
+   * @param file the file to create.
+   *
+   * @return {@code this} for builder chain.
+   *
+   * @throws IOException if something goes wrong with I/O.
+   */
+  @NotNull
+  public final TransformedObject createFile(@NotNull final File file) throws IOException {
+    return this.createFile(file.toPath());
+  }
+
+  /**
+   * creates the path.
+   *
+   * @param path the path to create.
+   *
+   * @return {@code this} for builder chain.
+   *
+   * @throws IOException if something goes wrong with I/O.
+   */
+  @NotNull
+  public final TransformedObject createFile(@NotNull final Path path) throws IOException {
+    if (this.exists(this.getParent(path))) {
+      this.createDirectory(path);
+    }
+    Files.createFile(path);
+    return this;
+  }
+
+  /**
+   * creates {@link #path}.
+   *
+   * @return {@code this} for builder chain.
+   *
+   * @throws NullPointerException if {@link #path} is null.
+   */
+  @NotNull
+  public final TransformedObject createFileUnchecked() {
+    return this.createFileUnchecked(Objects.requireNonNull(this.path, "path"));
+  }
+
+  /**
+   * creates the file.
+   *
+   * @param file the file to create.
+   *
+   * @return {@code this} for builder chain.
+   */
+  @NotNull
+  public final TransformedObject createFileUnchecked(@NotNull final File file) {
+    return this.createFileUnchecked(file.toPath());
+  }
+
+  /**
+   * creates the path.
+   *
+   * @param path the path to create.
+   *
+   * @return {@code this} for builder chain.
+   */
+  @NotNull
+  public final TransformedObject createFileUnchecked(@NotNull final Path path) {
+    try {
+      this.createFile(path);
+    } catch (final IOException e) {
+      e.printStackTrace();
+    }
+    return this;
+  }
+
+  /**
    * checks if the file exists or not.
    *
    * @return {@code true} if the file exists.
+   *
+   * @throws NullPointerException if {@link #path} is null.
    */
   public final boolean exists() {
-    Objects.requireNonNull(this.file, "file");
-    return TransformedObject.exists(this.file);
+    return this.exists(Objects.requireNonNull(this.path, "path"));
+  }
+
+  /**
+   * checks if the file exists or not.
+   *
+   * @param file the file to check.
+   *
+   * @return {@code true} if the file exists.
+   */
+  public final boolean exists(@NotNull final File file) {
+    return this.exists(file.toPath());
+  }
+
+  /**
+   * checks if the path exists or not.
+   *
+   * @param path the path to check.
+   *
+   * @return {@code true} if the file exists.
+   */
+  public final boolean exists(@NotNull final Path path) {
+    return Files.exists(path);
   }
 
   /**
@@ -132,6 +276,9 @@ public abstract class TransformedObject {
    * @param <T> type of the value.
    *
    * @return value at path.
+   *
+   * @throws NullPointerException if {@link #resolver} is null.
+   * @throws NullPointerException if {@link #declaration} is null.
    */
   @NotNull
   public final <T> Optional<T> get(@NotNull final String path, @NotNull final Class<T> cls) {
@@ -154,6 +301,9 @@ public abstract class TransformedObject {
    * @param path the path to get.
    *
    * @return value at path.
+   *
+   * @throws NullPointerException if {@link #resolver} is null.
+   * @throws NullPointerException if {@link #declaration} is null.
    */
   @NotNull
   public final Optional<Object> get(@NotNull final String path) {
@@ -167,19 +317,50 @@ public abstract class TransformedObject {
   }
 
   /**
+   * obtains all keys.
+   *
+   * @return all keys.
+   */
+  @NotNull
+  public final List<String> getAllKeys() {
+    return new ArrayList<>(Objects.requireNonNull(this.declaration, "declaration").getFields().keySet());
+  }
+
+  /**
+   * gets parent file of {@link #path}.
+   *
+   * @return parent path.
+   *
+   * @throws NullPointerException if {@link #path} is null.
+   */
+  @NotNull
+  public final Path getParent() {
+    return this.getParent(Objects.requireNonNull(this.path, "path"));
+  }
+
+  /**
+   * gets parent path of the path.
+   *
+   * @param path the parent path.
+   *
+   * @return parent path.
+   */
+  @NotNull
+  public final Path getParent(@NotNull final Path path) {
+    return path.toFile().getParentFile().toPath();
+  }
+
+  /**
    * loads the transformed object.
    *
    * @return {@code this} for builder chain.
    *
    * @throws TransformException if something goes wrong when loading the objects.
+   * @throws NullPointerException if {@link #path} is null.
    */
   @NotNull
   public final TransformedObject initiate() throws TransformException {
-    if (this.exists()) {
-      return this.load();
-    } else {
-      return this.save();
-    }
+    return this.initiate(Objects.requireNonNull(this.path, "path"));
   }
 
   /**
@@ -193,11 +374,44 @@ public abstract class TransformedObject {
    */
   @NotNull
   public final TransformedObject initiate(@NotNull final File file) throws TransformException {
-    if (TransformedObject.exists(file)) {
-      return this.load(file);
-    } else {
-      return this.save(file);
+    return this.initiate(file.toPath());
+  }
+
+  /**
+   * initiates the transformed object.
+   *
+   * @param path the path to initiate.
+   *
+   * @return {@code this} for builder chain.
+   *
+   * @throws TransformException if something goes wrong when loading the objects.
+   */
+  @NotNull
+  public final TransformedObject initiate(@NotNull final Path path) throws TransformException {
+    if (this.exists(path)) {
+      return this.load(path);
     }
+    this.createFileUnchecked(path);
+    return this.save(path);
+  }
+
+  /**
+   * loads the transformed object.
+   *
+   * @param update the update to load.
+   *
+   * @return {@code this} for builder chain.
+   *
+   * @throws TransformException if something goes wrong when loading the objects.
+   * @throws NullPointerException if {@link #path} is null.
+   */
+  @NotNull
+  public final TransformedObject load(final boolean update) throws TransformException {
+    this.load();
+    if (update) {
+      this.save();
+    }
+    return this;
   }
 
   /**
@@ -206,11 +420,11 @@ public abstract class TransformedObject {
    * @return {@code this} for builder chain.
    *
    * @throws TransformException if something goes wrong when loading the objects.
+   * @throws NullPointerException if {@link #path} is null.
    */
   @NotNull
   public final TransformedObject load() throws TransformException {
-    Objects.requireNonNull(this.file, "file");
-    return this.load(this.file);
+    return this.load(Objects.requireNonNull(this.path, "path"));
   }
 
   /**
@@ -224,10 +438,24 @@ public abstract class TransformedObject {
    */
   @NotNull
   public final TransformedObject load(@NotNull final File file) throws TransformException {
+    return this.load(file.toPath());
+  }
+
+  /**
+   * loads the transformed object.
+   *
+   * @param path the path to load.
+   *
+   * @return {@code this} for builder chain.
+   *
+   * @throws TransformException if something goes wrong when loading the objects.
+   */
+  @NotNull
+  public final TransformedObject load(@NotNull final Path path) throws TransformException {
     try {
-      return this.load(new FileInputStream(file));
+      return this.load(new FileInputStream(path.toFile()));
     } catch (final FileNotFoundException exception) {
-      throw new TransformException(String.format("Failed use #load with %s", file), exception);
+      throw new TransformException(String.format("Failed use #load(%s)", path), exception);
     }
   }
 
@@ -253,6 +481,8 @@ public abstract class TransformedObject {
    * @return {@code this} for builder chain.
    *
    * @throws TransformException if something goes wrong when loading the objects.
+   * @throws NullPointerException if {@link #resolver} is null.
+   * @throws NullPointerException if {@link #declaration} is null.
    */
   @NotNull
   public final TransformedObject load(@NotNull final InputStream inputStream) {
@@ -261,31 +491,26 @@ public abstract class TransformedObject {
     try {
       this.resolver.load(inputStream, this.declaration);
     } catch (final Exception exception) {
-      throw new TransformException("failed #load", exception);
+      throw new TransformException(String.format("Failed use #load(%s)", inputStream), exception);
     }
     return this.update();
   }
 
   /**
-   * loads the transformed object.
-   *
-   * @param update the update to load.
+   * saves the objects into the {@link #path}.
    *
    * @return {@code this} for builder chain.
    *
-   * @throws TransformException if something goes wrong when loading the objects.
+   * @throws TransformException if something goes wrong when saving objects into the file.
+   * @throws NullPointerException if {@link #path} is null.
    */
   @NotNull
-  public final TransformedObject load(final boolean update) throws TransformException {
-    this.load();
-    if (update) {
-      this.save();
-    }
-    return this;
+  public final TransformedObject save() throws TransformException {
+    return this.save(Objects.requireNonNull(this.path, "path"));
   }
 
   /**
-   * saves the objects into the {@link #file}.
+   * saves the objects into the file.
    *
    * @param file the file to save.
    *
@@ -293,28 +518,31 @@ public abstract class TransformedObject {
    *
    * @throws TransformException if something goes wrong when saving objects into the file.
    */
+  @NotNull
   public final TransformedObject save(@NotNull final File file) throws TransformException {
-    try {
-      final var parentFile = file.getParentFile();
-      if (!TransformedObject.exists(parentFile)) {
-        Files.createDirectories(parentFile.toPath());
-      }
-      return this.save(new PrintStream(new FileOutputStream(file, false), true, StandardCharsets.UTF_8.name()));
-    } catch (final Exception exception) {
-      throw new TransformException(String.format("Failed use #save with %s", file), exception);
-    }
+    return this.save(file.toPath());
   }
 
   /**
-   * saves the objects into the {@link #file}.
+   * saves the objects into the file.
+   *
+   * @param path the path to save.
    *
    * @return {@code this} for builder chain.
    *
    * @throws TransformException if something goes wrong when saving objects into the file.
    */
-  public final TransformedObject save() throws TransformException {
-    Objects.requireNonNull(this.file, "file");
-    return this.save(this.file);
+  @NotNull
+  public final TransformedObject save(@NotNull final Path path) throws TransformException {
+    try {
+      this.createFile(path);
+      return this.save(new PrintStream(
+        new FileOutputStream(path.toFile(), false),
+        true,
+        StandardCharsets.UTF_8.name()));
+    } catch (final Exception exception) {
+      throw new TransformException(String.format("Failed use #save with %s", path), exception);
+    }
   }
 
   /**
@@ -330,8 +558,7 @@ public abstract class TransformedObject {
   public final TransformedObject save(@NotNull final OutputStream outputStream) throws TransformException {
     Objects.requireNonNull(this.declaration, "declaration");
     Objects.requireNonNull(this.resolver, "resolver");
-    for (final var entry : this.declaration.getFields().entrySet()) {
-      final var fieldDeclaration = entry.getValue();
+    this.declaration.getFields().forEach((key, fieldDeclaration) -> {
       final var path = fieldDeclaration.getPath();
       final var fieldValue = fieldDeclaration.getValue();
       if (!this.resolver.isValid(fieldDeclaration, fieldValue)) {
@@ -343,7 +570,7 @@ public abstract class TransformedObject {
       } catch (final Exception exception) {
         throw new TransformException(String.format("Failed to use #setValue for %s", path), exception);
       }
-    }
+    });
     try {
       this.resolver.write(outputStream, this.declaration);
     } catch (final Exception exception) {
@@ -358,13 +585,42 @@ public abstract class TransformedObject {
    * @return {@code this} for builder chain.
    *
    * @throws TransformException if something goes wrong when sawing the defaults.
+   * @throws NullPointerException if {@link #path} is null.
    */
   @NotNull
   public final TransformedObject saveDefaults() throws TransformException {
-    if (this.exists()) {
-      this.save();
+    return this.saveDefaults(Objects.requireNonNull(this.path, "path"));
+  }
+
+  /**
+   * saves default values into the file.
+   *
+   * @param file the file to create.
+   *
+   * @return {@code this} for builder chain.
+   *
+   * @throws TransformException if something goes wrong when sawing the defaults.
+   */
+  @NotNull
+  public final TransformedObject saveDefaults(@NotNull final File file) throws TransformException {
+    if (this.exists(file)) {
+      this.save(file);
     }
     return this;
+  }
+
+  /**
+   * saves default values into the file.
+   *
+   * @param path the path to create.
+   *
+   * @return {@code this} for builder chain.
+   *
+   * @throws TransformException if something goes wrong when sawing the defaults.
+   */
+  @NotNull
+  public final TransformedObject saveDefaults(@NotNull final Path path) throws TransformException {
+    return this.saveDefaults(path.toFile());
   }
 
   /**
@@ -415,8 +671,7 @@ public abstract class TransformedObject {
   public final TransformedObject update() {
     Objects.requireNonNull(this.declaration, "declaration");
     Objects.requireNonNull(this.resolver, "resolver");
-    for (final var entry : this.declaration.getFields().entrySet()) {
-      final var fieldDeclaration = entry.getValue();
+    this.declaration.getFields().forEach((key, fieldDeclaration) -> {
       final var fieldPath = fieldDeclaration.getPath();
       final var genericType = fieldDeclaration.getGenericDeclaration();
       final var type = Objects.requireNonNull(genericType.getType(), "type");
@@ -443,7 +698,7 @@ public abstract class TransformedObject {
         }
       }
       if (!this.resolver.pathExists(fieldPath)) {
-        continue;
+        return;
       }
       final Object value;
       try {
@@ -461,7 +716,7 @@ public abstract class TransformedObject {
         }
       }
       fieldDeclaration.setStartingValue(value);
-    }
+    });
     return this;
   }
 
@@ -479,7 +734,7 @@ public abstract class TransformedObject {
   }
 
   /**
-   * sets the file.
+   * sets the {@link #path}.
    *
    * @param file the file to set.
    *
@@ -487,30 +742,30 @@ public abstract class TransformedObject {
    */
   @NotNull
   public final TransformedObject withFile(@NotNull final File file) {
-    this.file = file;
+    return this.withFile(file.toPath());
+  }
+
+  /**
+   * sets the {@link #path}.
+   *
+   * @param path the path to set.
+   *
+   * @return {@code this} for builder chain.
+   */
+  public final TransformedObject withFile(@NotNull final String path) {
+    return this.withFile(Path.of(path));
+  }
+
+  /**
+   * sets the {@link #path}.
+   *
+   * @param path the path to set.
+   *
+   * @return {@code this} for builder chain.
+   */
+  public final TransformedObject withFile(@NotNull final Path path) {
+    this.path = path;
     return this;
-  }
-
-  /**
-   * sets the file.
-   *
-   * @param path the path to set.
-   *
-   * @return {@code this} for builder chain.
-   */
-  public final TransformedObject withPath(@NotNull final String path) {
-    return this.withPath(Path.of(path));
-  }
-
-  /**
-   * sets the file.
-   *
-   * @param path the path to set.
-   *
-   * @return {@code this} for builder chain.
-   */
-  public final TransformedObject withPath(@NotNull final Path path) {
-    return this.withFile(path.toFile());
   }
 
   /**
@@ -527,6 +782,18 @@ public abstract class TransformedObject {
   }
 
   /**
+   * register the transformer pack.
+   *
+   * @param consumer the consumer to register.
+   *
+   * @return {@code this} for builder chain.
+   */
+  @NotNull
+  public final TransformedObject withTransformPack(@NotNull final Consumer<@NotNull TransformRegistry> consumer) {
+    return this.withTransformPack(TransformPack.create(consumer));
+  }
+
+  /**
    * register the transform pack.
    *
    * @param pack the pack to register.
@@ -537,17 +804,5 @@ public abstract class TransformedObject {
   public final TransformedObject withTransformPack(@NotNull final TransformPack pack) {
     Objects.requireNonNull(this.resolver, "resolver").withTransformerPacks(pack);
     return this;
-  }
-
-  /**
-   * register the transformer pack.
-   *
-   * @param consumer the consumer to register.
-   *
-   * @return {@code this} for builder chain.
-   */
-  @NotNull
-  public final TransformedObject withTransformPack(@NotNull final Consumer<@NotNull TransformRegistry> consumer) {
-    return this.withTransformPack(TransformPack.create(consumer));
   }
 }

@@ -22,6 +22,12 @@
   <properties>
     <java.version>11</java.version>
   </properties>
+  <repositories>
+    <repository>
+      <url>https://storehouse.okaeri.eu/repository/maven-public/</url>
+      <id>okaeri-repo</id>
+    </repository>
+  </repositories>
   <dependencies>
     <dependency>
       <groupId>com.github.portlek</groupId>
@@ -40,6 +46,12 @@
     <dependency>
       <groupId>org.jetbrains</groupId>
       <artifactId>annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>eu.okaeri</groupId>
+      <artifactId>okaeri-hjson</artifactId>
+      <version>4.0.0</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

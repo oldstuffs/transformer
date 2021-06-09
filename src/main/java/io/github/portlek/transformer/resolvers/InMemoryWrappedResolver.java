@@ -56,6 +56,7 @@ public final class InMemoryWrappedResolver extends WrappedTransformResolver {
     this.map = map;
   }
 
+  @NotNull
   @Override
   public List<String> getAllKeys() {
     return List.copyOf(this.map.keySet());

@@ -49,6 +49,7 @@ public final class InMemoryResolver extends TransformResolver {
   @NotNull
   private final Map<String, Object> map = new LinkedHashMap<>();
 
+  @NotNull
   @Override
   public List<String> getAllKeys() {
     return List.copyOf(this.map.keySet());

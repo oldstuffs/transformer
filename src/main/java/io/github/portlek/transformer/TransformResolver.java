@@ -33,7 +33,6 @@ import io.github.portlek.transformer.exceptions.TransformException;
 import io.github.portlek.transformer.resolvers.InMemoryWrappedResolver;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -272,15 +271,11 @@ public abstract class TransformResolver {
    *
    * @return all keys.
    */
+  @NotNull
   public List<String> getAllKeys() {
-    if (this.parentObject == null) {
-      return Collections.emptyList();
-    }
-    final var declaration = this.parentObject.getDeclaration();
-    if (declaration == null) {
-      throw new TransformException("Something went wrong when getting all keys of the parent object.");
-    }
-    return new ArrayList<>(declaration.getFields().keySet());
+    return this.parentObject == null
+      ? Collections.emptyList()
+      : this.parentObject.getAllKeys();
   }
 
   /**

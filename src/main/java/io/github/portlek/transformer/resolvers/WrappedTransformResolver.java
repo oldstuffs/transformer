@@ -61,6 +61,7 @@ public abstract class WrappedTransformResolver extends TransformResolver {
     return this.delegate.deserialize(object, genericSource, targetClass, genericTarget);
   }
 
+  @NotNull
   @Override
   public List<String> getAllKeys() {
     return this.delegate.getAllKeys();
