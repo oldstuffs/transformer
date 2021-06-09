@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>io.github.parentpom</groupId>
+    <artifactId>ppom</artifactId>
+    <version>3.2.4</version>
+  </parent>
+  <groupId>io.github.portlek</groupId>
+  <artifactId>transformer</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <name>transformer</name>
+  <description>Object serializer and transformer library.</description>
+  <url>https://github.com/portlek/transformer</url>
+  <scm>
+    <url>https://github.com/portlek/transformer</url>
+    <connection>scm:git:git://github.com/portlek/transformer.git</connection>
+    <developerConnection>scm:git:ssh://github.com/portlek/transformer.git</developerConnection>
+  </scm>
+  <properties>
+    <java.version>11</java.version>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jetbrains</groupId>
+      <artifactId>annotations</artifactId>
+    </dependency>
+  </dependencies>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.github.portlek</groupId>
+        <artifactId>reflection</artifactId>
+        <version>4.3.10</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.portlek</groupId>
+        <artifactId>replaceable</artifactId>
+        <version>2.5.3</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+</project>
