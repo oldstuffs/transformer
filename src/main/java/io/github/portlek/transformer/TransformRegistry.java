@@ -26,6 +26,7 @@
 package io.github.portlek.transformer;
 
 import io.github.portlek.transformer.declarations.GenericDeclaration;
+import io.github.portlek.transformer.declarations.GenericPair;
 import io.github.portlek.transformer.transformers.TransformerObjectToString;
 import java.util.Collection;
 import java.util.Collections;

@@ -23,9 +23,8 @@
  *
  */
 
-package io.github.portlek.transformer;
+package io.github.portlek.transformer.declarations;
 
-import io.github.portlek.transformer.declarations.GenericDeclaration;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -51,7 +50,7 @@ public interface GenericHolder<L, R> {
    */
   @NotNull
   static <L, R> GenericHolder<L, R> create(@NotNull final Class<L> left, @NotNull final Class<R> right) {
-    return GenericHolder.create(GenericDeclaration.of(left), GenericDeclaration.of(right));
+    return GenericHolder.create(GenericDeclaration.ofReady(left), GenericDeclaration.ofReady(right));
   }
 
   /**

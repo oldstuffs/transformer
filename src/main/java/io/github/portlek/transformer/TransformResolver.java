@@ -148,7 +148,7 @@ public abstract class TransformResolver {
       ? GenericDeclaration.of(object)
       : genericSource;
     var target = genericTarget == null
-      ? GenericDeclaration.of(targetClass)
+      ? GenericDeclaration.ofReady(targetClass)
       : genericTarget;
     if (target.isPrimitive()) {
       target = GenericDeclaration.ofReady(target.toWrapper().orElse(null));
@@ -248,9 +248,9 @@ public abstract class TransformResolver {
       if (targetClass.isPrimitive() && GenericDeclaration.isWrapperBoth(targetClass, objectClass)) {
         return (T) GenericDeclaration.toPrimitive(object);
       }
-      if (targetClass.isPrimitive() || GenericDeclaration.of(targetClass).hasWrapper()) {
-        final var simplified = this.serialize(object, GenericDeclaration.of(objectClass), false);
-        return this.deserialize(simplified, GenericDeclaration.of(simplified), targetClass, GenericDeclaration.of(targetClass), defaultValue);
+      if (targetClass.isPrimitive() || GenericDeclaration.ofReady(targetClass).hasWrapper()) {
+        final var simplified = this.serialize(object, GenericDeclaration.ofReady(objectClass), false);
+        return this.deserialize(simplified, GenericDeclaration.of(simplified), targetClass, GenericDeclaration.ofReady(targetClass), defaultValue);
       }
       try {
         return targetClass.cast(object);
@@ -342,7 +342,7 @@ public abstract class TransformResolver {
     if (object instanceof Class<?>) {
       final var cls = (Class<?>) object;
       return cls.isEnum() ||
-        this.registry.getTransformer(declaration, GenericDeclaration.of(String.class)).isPresent();
+        this.registry.getTransformer(declaration, GenericDeclaration.ofReady(String.class)).isPresent();
     }
     return object.getClass().isEnum() ||
       this.isToStringObject(object.getClass(), declaration);
@@ -411,12 +411,12 @@ public abstract class TransformResolver {
     }
     final var serializerOptional = this.registry.getSerializer(serializerType);
     if (serializerOptional.isEmpty()) {
-      if (conservative && (serializerType.isPrimitive() || GenericDeclaration.of(serializerType).hasWrapper())) {
+      if (conservative && (serializerType.isPrimitive() || GenericDeclaration.ofReady(serializerType).hasWrapper())) {
         return value;
       }
       if (serializerType.isPrimitive()) {
-        final var wrappedPrimitive = GenericDeclaration.of(serializerType).toWrapper().orElseThrow();
-        return this.serialize(wrappedPrimitive.cast(value), GenericDeclaration.of(wrappedPrimitive), false);
+        final var wrappedPrimitive = GenericDeclaration.ofReady(serializerType).toWrapper().orElseThrow();
+        return this.serialize(wrappedPrimitive.cast(value), GenericDeclaration.ofReady(wrappedPrimitive), false);
       }
       if (genericType == null) {
         final var valueDeclaration = GenericDeclaration.of(value);

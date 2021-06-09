@@ -295,7 +295,7 @@ public abstract class TransformedObject {
       field.getValue(),
       field.getGenericDeclaration(),
       cls,
-      GenericDeclaration.of(cls),
+      GenericDeclaration.ofReady(cls),
       field.getStartingValue()));
   }
 

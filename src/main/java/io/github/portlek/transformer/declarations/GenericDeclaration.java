@@ -38,11 +38,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -52,7 +51,6 @@ import org.jetbrains.annotations.Nullable;
 @Getter
 @ToString
 @EqualsAndHashCode
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class GenericDeclaration {
 
   /**
@@ -115,6 +113,22 @@ public final class GenericDeclaration {
    */
   @Nullable
   private final Class<?> type;
+
+  /**
+   * ctor.
+   *
+   * @param isEnum the is enum.
+   * @param isPrimitive the is primitive.
+   * @param subTypes the sub types.
+   * @param type the type.
+   */
+  private GenericDeclaration(final boolean isEnum, final boolean isPrimitive,
+                             @NotNull final List<GenericDeclaration> subTypes, @Nullable final Class<?> type) {
+    this.isEnum = isEnum;
+    this.isPrimitive = isPrimitive;
+    this.subTypes = GenericDeclaration.convertSimple(subTypes);
+    this.type = GenericDeclaration.convertSimple(type);
+  }
 
   /**
    * ctor.
@@ -185,7 +199,7 @@ public final class GenericDeclaration {
   @NotNull
   public static GenericDeclaration of(@Nullable final Class<?> type, @NotNull final Class<?>... subTypes) {
     return GenericDeclaration.ofReady(type, Arrays.stream(subTypes)
-      .map(GenericDeclaration::of)
+      .map(GenericDeclaration::ofReady)
       .collect(Collectors.toList()));
   }
 
@@ -248,9 +262,9 @@ public final class GenericDeclaration {
   @NotNull
   public static GenericDeclaration of(@NotNull final Object object) {
     if (object instanceof Class<?>) {
-      return GenericDeclaration.of((Class<?>) object);
+      return GenericDeclaration.ofReady((Class<?>) object);
     }
-    return GenericDeclaration.of(object.getClass());
+    return GenericDeclaration.ofReady(object.getClass());
   }
 
   /**
@@ -314,6 +328,45 @@ public final class GenericDeclaration {
       return ((Short) object).shortValue();
     }
     return object;
+  }
+
+  /**
+   * converts the declarations into simple types.
+   *
+   * @param declarations the declarations to convert.
+   *
+   * @return converted declarations.
+   */
+  @NotNull
+  private static List<GenericDeclaration> convertSimple(@NotNull final List<GenericDeclaration> declarations) {
+    return declarations.stream()
+      .map(declaration ->
+        new GenericDeclaration(declaration.isEnum(), declaration.isPrimitive(),
+          GenericDeclaration.convertSimple(declaration.getSubTypes()),
+          GenericDeclaration.convertSimple(declaration.getType())))
+      .collect(Collectors.toList());
+  }
+
+  /**
+   * converts the class into simple type.
+   *
+   * @param cls the cls to convert.
+   *
+   * @return converted class.
+   */
+  @Nullable
+  @Contract("null -> null; !null -> !null")
+  private static Class<?> convertSimple(@Nullable final Class<?> cls) {
+    if (cls == null) {
+      return null;
+    }
+    if (List.class.isAssignableFrom(cls)) {
+      return List.class;
+    }
+    if (Map.class.isAssignableFrom(cls)) {
+      return Map.class;
+    }
+    return cls;
   }
 
   /**

@@ -26,6 +26,7 @@
 package io.github.portlek.transformer;
 
 import io.github.portlek.transformer.declarations.GenericDeclaration;
+import io.github.portlek.transformer.declarations.GenericHolder;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -283,7 +284,7 @@ public interface TwoSideTransformer<R, F> extends Transformer<R, F> {
     protected Base(@NotNull final Class<R> rawType, @NotNull final Class<F> finalType,
                    @NotNull final Function<@NotNull F, @Nullable R> toRaw,
                    @NotNull final Function<@NotNull R, @Nullable F> toFinal) {
-      this(GenericDeclaration.of(rawType), GenericDeclaration.of(finalType), toRaw, toFinal);
+      this(GenericDeclaration.ofReady(rawType), GenericDeclaration.ofReady(finalType), toRaw, toFinal);
     }
 
     /**
@@ -358,7 +359,7 @@ public interface TwoSideTransformer<R, F> extends Transformer<R, F> {
                  @NotNull final Function<@NotNull F, @Nullable R> toRaw,
                  @NotNull final Function<@NotNull R, @Nullable F> toFinal,
                  @NotNull final BiFunction<@NotNull R, @NotNull F, @Nullable F> toFinalWithField) {
-      this(GenericDeclaration.of(rawType), GenericDeclaration.of(finalType), toRaw, toFinal, toFinalWithField);
+      this(GenericDeclaration.ofReady(rawType), GenericDeclaration.ofReady(finalType), toRaw, toFinal, toFinalWithField);
     }
 
     /**
@@ -387,7 +388,7 @@ public interface TwoSideTransformer<R, F> extends Transformer<R, F> {
     private Impl(@NotNull final Class<R> rawType, @NotNull final Class<F> finalType,
                  @NotNull final Function<@NotNull F, @Nullable R> toRaw,
                  @NotNull final Function<@NotNull R, @Nullable F> toFinal) {
-      this(GenericDeclaration.of(rawType), GenericDeclaration.of(finalType), toRaw, toFinal);
+      this(GenericDeclaration.ofReady(rawType), GenericDeclaration.ofReady(finalType), toRaw, toFinal);
     }
   }
 }

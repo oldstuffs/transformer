@@ -23,9 +23,8 @@
  *
  */
 
-package io.github.portlek.transformer;
+package io.github.portlek.transformer.declarations;
 
-import io.github.portlek.transformer.declarations.GenericDeclaration;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -78,7 +77,7 @@ public final class GenericPair {
    */
   @NotNull
   public static GenericPair of(@NotNull final Class<?> left, @NotNull final Class<?> right) {
-    return GenericPair.of(GenericDeclaration.of(left), GenericDeclaration.of(right));
+    return GenericPair.of(GenericDeclaration.ofReady(left), GenericDeclaration.ofReady(right));
   }
 
   /**
