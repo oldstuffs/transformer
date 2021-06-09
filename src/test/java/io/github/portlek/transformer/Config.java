@@ -37,13 +37,13 @@ public final class Config extends TransformedObject {
     .regex("%test%");
 
   public static void main(final String[] args) {
-    TransformerPool.create(Config.class)
+    final var config = TransformerPool.create(Config.class)
       .withFile(Path.of(System.getProperty("user.dir"))
         .resolve("target")
         .resolve("config.hjson"))
       .withResolver(new HJsonConfigurer())
       .initiate();
-    System.out.println(Config.test);
+    System.out.println(config.get("test", RpString.class));
   }
 
   private static final class HJsonConfigurer extends TransformResolver {

@@ -129,15 +129,17 @@ public abstract class TransformResolver {
    * @param targetClass the target class to deserialize.
    * @param genericSource the generic source to deserialize.
    * @param genericTarget the generic target to deserialize.
+   * @param defaultValue the default value of the field.
    * @param <T> type of the deserialized object class.
    *
    * @return deserialized object.
    */
   @SuppressWarnings("unchecked")
   @Nullable
-  @Contract("null, _, _, _ -> null; !null, _, _, _ -> !null")
+  @Contract("null, _, _, _, _-> null; !null, _, _, _, _ -> !null")
   public <T> T deserialize(@Nullable final Object object, @Nullable final GenericDeclaration genericSource,
-                           @NotNull final Class<T> targetClass, @Nullable final GenericDeclaration genericTarget)
+                           @NotNull final Class<T> targetClass, @Nullable final GenericDeclaration genericTarget,
+                           @Nullable final Object defaultValue)
     throws TransformException {
     if (object == null) {
       return null;
@@ -197,7 +199,7 @@ public abstract class TransformResolver {
       final var transformedObject = TransformerPool.create((Class<? extends TransformedObject>) targetClass);
       transformedObject.withResolver(new InMemoryWrappedResolver(
         this,
-        this.deserialize(object, source, Map.class, GenericDeclaration.of(Map.class, String.class, Object.class))));
+        this.deserialize(object, source, Map.class, GenericDeclaration.of(Map.class, String.class, Object.class), defaultValue)));
       return (T) transformedObject.update();
     }
     final var serializer = this.registry.getSerializer(targetClass);
@@ -216,7 +218,7 @@ public abstract class TransformResolver {
           throw new TransformException(String.format("Something went wrong when getting type of %s", genericTarget));
         }
         for (final var item : sourceList) {
-          targetList.add(this.deserialize(item, GenericDeclaration.of(item), declaration.getType(), declaration));
+          targetList.add(this.deserialize(item, GenericDeclaration.of(item), declaration.getType(), declaration, defaultValue));
         }
         return targetClass.cast(targetList);
       }
@@ -235,8 +237,8 @@ public abstract class TransformResolver {
         final var map = (Map<Object, Object>) TransformerPool.createInstance(targetClass);
         for (final var entry : values.entrySet()) {
           map.put(
-            this.deserialize(entry.getKey(), GenericDeclaration.of(entry.getKey()), keyDeclaration.getType(), keyDeclaration),
-            this.deserialize(entry.getValue(), GenericDeclaration.of(entry.getValue()), valueDeclaration.getType(), valueDeclaration));
+            this.deserialize(entry.getKey(), GenericDeclaration.of(entry.getKey()), keyDeclaration.getType(), keyDeclaration, defaultValue),
+            this.deserialize(entry.getValue(), GenericDeclaration.of(entry.getValue()), valueDeclaration.getType(), valueDeclaration, defaultValue));
         }
         return targetClass.cast(map);
       }
@@ -248,7 +250,7 @@ public abstract class TransformResolver {
       }
       if (targetClass.isPrimitive() || GenericDeclaration.of(targetClass).hasWrapper()) {
         final var simplified = this.serialize(object, GenericDeclaration.of(objectClass), false);
-        return this.deserialize(simplified, GenericDeclaration.of(simplified), targetClass, GenericDeclaration.of(targetClass));
+        return this.deserialize(simplified, GenericDeclaration.of(simplified), targetClass, GenericDeclaration.of(targetClass), defaultValue);
       }
       try {
         return targetClass.cast(object);
@@ -259,11 +261,17 @@ public abstract class TransformResolver {
     }
     //noinspection rawtypes
     final Transformer transformer = transformerOptional.get();
-    if (targetClass.isPrimitive()) {
-      final var transformed = transformer.transform(object);
-      return (T) GenericDeclaration.toPrimitive(transformed);
+    final Object transformed;
+    if (defaultValue == null) {
+      transformed = transformer.transform(object).orElse(null);
+    } else {
+      transformed = transformer.transformWithField(object, defaultValue)
+        .orElse(transformer.transform(object)
+          .orElse(null));
     }
-    return targetClass.cast(transformer.transform(object).orElse(null));
+    return targetClass.isPrimitive()
+      ? (T) GenericDeclaration.toPrimitive(transformed)
+      : targetClass.cast(transformed);
   }
 
   /**
@@ -294,15 +302,17 @@ public abstract class TransformResolver {
    * @param path the path to get.
    * @param cls the cls to get.
    * @param genericType the generic type to get.
+   * @param defaultValue the default value of the field.
    * @param <T> type of the value.
    *
    * @return value at path.
    */
   @NotNull
   public <T> Optional<T> getValue(@NotNull final String path, @NotNull final Class<T> cls,
-                                  @Nullable final GenericDeclaration genericType) {
+                                  @Nullable final GenericDeclaration genericType,
+                                  @Nullable final Object defaultValue) {
     return this.getValue(path)
-      .map(value -> this.deserialize(value, GenericDeclaration.of(value), cls, genericType));
+      .map(value -> this.deserialize(value, GenericDeclaration.of(value), cls, genericType, defaultValue));
   }
 
   /**
@@ -396,11 +406,11 @@ public abstract class TransformResolver {
       if (genericType == null) {
         final var valueDeclaration = GenericDeclaration.of(value);
         if (this.isToStringObject(serializerType, valueDeclaration)) {
-          return this.deserialize(value, null, String.class, null);
+          return this.deserialize(value, null, String.class, null, null);
         }
       }
       if (this.isToStringObject(serializerType, genericType)) {
-        return this.deserialize(value, genericType, String.class, null);
+        return this.deserialize(value, genericType, String.class, null, null);
       }
       if (value instanceof Collection<?>) {
         return this.serializeCollection((Collection<?>) value, genericType, conservative);

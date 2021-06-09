@@ -56,9 +56,10 @@ public abstract class WrappedTransformResolver extends TransformResolver {
   @Nullable
   @Override
   public <T> T deserialize(@Nullable final Object object, @Nullable final GenericDeclaration genericSource,
-                           @NotNull final Class<T> targetClass, @Nullable final GenericDeclaration genericTarget)
+                           @NotNull final Class<T> targetClass, @Nullable final GenericDeclaration genericTarget,
+                           @Nullable final Object defaultValue)
     throws TransformException {
-    return this.delegate.deserialize(object, genericSource, targetClass, genericTarget);
+    return this.delegate.deserialize(object, genericSource, targetClass, genericTarget, defaultValue);
   }
 
   @NotNull
@@ -71,13 +72,6 @@ public abstract class WrappedTransformResolver extends TransformResolver {
   @Override
   public Optional<Object> getValue(@NotNull final String path) {
     return this.delegate.getValue(path);
-  }
-
-  @NotNull
-  @Override
-  public <T> Optional<T> getValue(@NotNull final String path, @NotNull final Class<T> cls,
-                                  @Nullable final GenericDeclaration genericType) {
-    return this.delegate.getValue(path, cls, genericType);
   }
 
   @Override

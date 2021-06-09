@@ -289,13 +289,14 @@ public abstract class TransformedObject {
     Objects.requireNonNull(this.declaration, "declaration");
     final var field = this.declaration.getFields().get(path);
     if (field == null) {
-      return this.resolver.getValue(path, cls, null);
+      return this.resolver.getValue(path, cls, null, null);
     }
     return Optional.ofNullable(this.resolver.deserialize(
       field.getValue(),
       field.getGenericDeclaration(),
       cls,
-      GenericDeclaration.of(cls)));
+      GenericDeclaration.of(cls),
+      field.getStartingValue()));
   }
 
   /**
@@ -731,7 +732,7 @@ public abstract class TransformedObject {
     if (field != null) {
       final var declaration = field.getGenericDeclaration();
       if (declaration.getType() != null) {
-        tempValue = this.resolver.deserialize(tempValue, GenericDeclaration.of(tempValue), declaration.getType(), declaration);
+        tempValue = this.resolver.deserialize(tempValue, GenericDeclaration.of(tempValue), declaration.getType(), declaration, null);
       }
       field.setValue(tempValue);
     }
@@ -761,7 +762,7 @@ public abstract class TransformedObject {
         if (property != null) {
           final Object value;
           try {
-            value = this.resolver.deserialize(property, GenericDeclaration.of(property), type, genericType);
+            value = this.resolver.deserialize(property, GenericDeclaration.of(property), type, genericType, fieldDeclaration.getStartingValue());
           } catch (final Exception exception) {
             throw new TransformException(String.format("Failed to use #deserialize for @Variable { %s }",
               variableValue), exception);
@@ -780,7 +781,7 @@ public abstract class TransformedObject {
       }
       final Object value;
       try {
-        value = this.resolver.getValue(fieldPath, type, genericType).orElse(null);
+        value = this.resolver.getValue(fieldPath, type, genericType, fieldDeclaration.getStartingValue()).orElse(null);
       } catch (final Exception exception) {
         throw new TransformException(String.format("Failed to use #getValue for %s", fieldPath), exception);
       }

@@ -121,6 +121,7 @@ public final class TransformedData {
       object,
       GenericDeclaration.of(object),
       objectClass,
+      null,
       null));
   }
 
@@ -147,7 +148,8 @@ public final class TransformedData {
       object,
       GenericDeclaration.of(object),
       List.class,
-      GenericDeclaration.of(List.class, elementClass)));
+      GenericDeclaration.of(List.class, elementClass),
+      null));
   }
 
   /**
@@ -176,7 +178,8 @@ public final class TransformedData {
       object,
       GenericDeclaration.of(object),
       Map.class,
-      GenericDeclaration.of(Map.class, keyClass, valueClass)));
+      GenericDeclaration.of(Map.class, keyClass, valueClass),
+      null));
   }
 
   /**
