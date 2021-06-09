@@ -37,18 +37,20 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import sun.misc.Unsafe;
 
 /**
  * a class that represents transformer pools.
  */
 @Getter
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TransformerPool {
+
+  /**
+   * ctor.
+   */
+  private TransformerPool() {
+  }
 
   /**
    * creates a new transformed object.
@@ -138,8 +140,8 @@ public final class TransformerPool {
    * @return allocated instance.
    */
   @NotNull
-  private static Object allocateInstance(@NotNull final Class<?> cls) {
-    final var unsafeClassOf = new ClassOf<>(Unsafe.class);
+  private static Object allocateInstance(@NotNull final Class<?> cls) throws Exception {
+    final var unsafeClassOf = new ClassOf<>("sun.misc.Unsafe");
     return unsafeClassOf.getField("theUnsafe")
       .flatMap(RefField::getValue)
       .flatMap(object -> unsafeClassOf.getMethod("allocateInstance", Class.class)

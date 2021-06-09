@@ -66,6 +66,7 @@ public final class TransformedData {
    * creates a new transformed data instance for deserialization.
    *
    * @param resolver the resolver to create.
+   * @param map the map to create.
    *
    * @return a transformed data instance for deserialization.
    */

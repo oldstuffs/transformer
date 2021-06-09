@@ -315,6 +315,8 @@ public abstract class TransformResolver {
    *
    * @param object the object to check.
    * @param declaration the generic declaration to check.
+   *
+   * @return {@code true} if the object can be converted tos string.
    */
   public boolean isToStringObject(@NotNull final Object object, @Nullable final GenericDeclaration declaration) {
     if (object instanceof Class<?>) {

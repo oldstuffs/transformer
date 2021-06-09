@@ -39,6 +39,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * a class that represents transformer registries.
+ */
 public final class TransformRegistry {
 
   /**

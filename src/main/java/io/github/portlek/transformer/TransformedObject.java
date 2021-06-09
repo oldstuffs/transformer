@@ -76,6 +76,8 @@ public abstract class TransformedObject {
   /**
    * checks if the file exists or not.
    *
+   * @param file the file to check.
+   *
    * @return {@code true} if the file exists.
    */
   public static boolean exists(@NotNull final File file) {
@@ -87,6 +89,8 @@ public abstract class TransformedObject {
    *
    * @param resolver the resolver to get.
    * @param conservative the conservative to get.
+   *
+   * @return values as map.
    *
    * @throws TransformException if something goes wrong when getting the value as map.
    */
@@ -179,7 +183,9 @@ public abstract class TransformedObject {
   }
 
   /**
-   * loads the transformed object.
+   * initiates the transformed object.
+   *
+   * @param file the file to initiate.
    *
    * @return {@code this} for builder chain.
    *
