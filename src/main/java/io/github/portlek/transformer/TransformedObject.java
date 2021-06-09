@@ -363,7 +363,22 @@ public abstract class TransformedObject {
    */
   @NotNull
   public final TransformedObject initiate() throws TransformException {
-    return this.initiate(Objects.requireNonNull(this.path, "path"));
+    return this.initiate(true);
+  }
+
+  /**
+   * loads the transformed object.
+   *
+   * @param update the update to initiate.
+   *
+   * @return {@code this} for builder chain.
+   *
+   * @throws TransformException if something goes wrong when loading the objects.
+   * @throws NullPointerException if {@link #path} is null.
+   */
+  @NotNull
+  public final TransformedObject initiate(final boolean update) throws TransformException {
+    return this.initiate(Objects.requireNonNull(this.path, "path"), update);
   }
 
   /**
@@ -377,7 +392,22 @@ public abstract class TransformedObject {
    */
   @NotNull
   public final TransformedObject initiate(@NotNull final File file) throws TransformException {
-    return this.initiate(file.toPath());
+    return this.initiate(file, true);
+  }
+
+  /**
+   * initiates the transformed object.
+   *
+   * @param file the file to initiate.
+   * @param update the update to initiate.
+   *
+   * @return {@code this} for builder chain.
+   *
+   * @throws TransformException if something goes wrong when loading the objects.
+   */
+  @NotNull
+  public final TransformedObject initiate(@NotNull final File file, final boolean update) throws TransformException {
+    return this.initiate(file.toPath(), update);
   }
 
   /**
@@ -391,11 +421,39 @@ public abstract class TransformedObject {
    */
   @NotNull
   public final TransformedObject initiate(@NotNull final Path path) throws TransformException {
+    return this.initiate(path, true);
+  }
+
+  /**
+   * initiates the transformed object.
+   *
+   * @param path the path to initiate.
+   * @param update the update to initiate.
+   *
+   * @return {@code this} for builder chain.
+   *
+   * @throws TransformException if something goes wrong when loading the objects.
+   */
+  @NotNull
+  public final TransformedObject initiate(@NotNull final Path path, final boolean update) throws TransformException {
     if (this.exists(path)) {
-      return this.load(path);
+      return this.load(path, update);
     }
     this.createFileUnchecked(path);
     return this.save(path);
+  }
+
+  /**
+   * loads the transformed object.
+   *
+   * @return {@code this} for builder chain.
+   *
+   * @throws TransformException if something goes wrong when loading the objects.
+   * @throws NullPointerException if {@link #path} is null.
+   */
+  @NotNull
+  public final TransformedObject load() throws TransformException {
+    return this.load(true);
   }
 
   /**
@@ -410,24 +468,7 @@ public abstract class TransformedObject {
    */
   @NotNull
   public final TransformedObject load(final boolean update) throws TransformException {
-    this.load();
-    if (update) {
-      this.save();
-    }
-    return this;
-  }
-
-  /**
-   * loads the transformed object.
-   *
-   * @return {@code this} for builder chain.
-   *
-   * @throws TransformException if something goes wrong when loading the objects.
-   * @throws NullPointerException if {@link #path} is null.
-   */
-  @NotNull
-  public final TransformedObject load() throws TransformException {
-    return this.load(Objects.requireNonNull(this.path, "path"));
+    return this.load(Objects.requireNonNull(this.path, "path"), update);
   }
 
   /**
@@ -441,7 +482,22 @@ public abstract class TransformedObject {
    */
   @NotNull
   public final TransformedObject load(@NotNull final File file) throws TransformException {
-    return this.load(file.toPath());
+    return this.load(file, true);
+  }
+
+  /**
+   * loads the transformed object.
+   *
+   * @param file the file to load.
+   * @param update the update to load.
+   *
+   * @return {@code this} for builder chain.
+   *
+   * @throws TransformException if something goes wrong when loading the objects.
+   */
+  @NotNull
+  public final TransformedObject load(@NotNull final File file, final boolean update) throws TransformException {
+    return this.load(file.toPath(), update);
   }
 
   /**
@@ -455,11 +511,30 @@ public abstract class TransformedObject {
    */
   @NotNull
   public final TransformedObject load(@NotNull final Path path) throws TransformException {
+    return this.load(path, true);
+  }
+
+  /**
+   * loads the transformed object.
+   *
+   * @param path the path to load.
+   * @param update the update to load.
+   *
+   * @return {@code this} for builder chain.
+   *
+   * @throws TransformException if something goes wrong when loading the objects.
+   */
+  @NotNull
+  public final TransformedObject load(@NotNull final Path path, final boolean update) throws TransformException {
     try {
-      return this.load(new FileInputStream(path.toFile()));
+      this.load(new FileInputStream(path.toFile()));
     } catch (final FileNotFoundException exception) {
       throw new TransformException(String.format("Failed use #load(%s)", path), exception);
     }
+    if (update) {
+      this.save(path);
+    }
+    return this;
   }
 
   /**
