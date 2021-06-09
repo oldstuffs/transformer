@@ -13,8 +13,8 @@ import io.github.portlek.transformer.declarations.FieldDeclaration;
 import io.github.portlek.transformer.declarations.GenericDeclaration;
 import io.github.portlek.transformer.declarations.TransformedObjectDeclaration;
 import io.github.portlek.transformer.exceptions.TransformException;
-import io.github.portlek.transformer.postprocessor.SectionSeparator;
 import io.github.portlek.transformer.postprocessor.PostProcessor;
+import io.github.portlek.transformer.postprocessor.SectionSeparator;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Path;
@@ -33,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
 public final class Config extends TransformedObject {
 
   @Comment({"test", "test"})
-  public static RpList test = RpList.from("test-1", "test-2", "test-3")
+  public static RpList test = RpList.from("%test%-1", "%test%-2", "%test%-3")
     .regex("%test%");
 
   public static void main(final String[] args) {
@@ -192,14 +192,13 @@ public final class Config extends TransformedObject {
       }
       if (value instanceof JsonArray) {
         final var values = new ArrayList<>();
-        final var array = (JsonArray) value;
-        array.forEach(item -> values.add(this.fromJsonValue(item)));
+        ((JsonArray) value).forEach(item -> values.add(this.fromJsonValue(item)));
         return Optional.of(values);
       }
       if (value instanceof JsonObject) {
         final var map = new LinkedHashMap<String, Object>();
         final var object = (JsonObject) value;
-        object.names().forEach(name -> map.put(name, this.fromJsonValue(object.get(name))));
+        object.forEach(member -> map.put(member.getName(), this.fromJsonValue(member.getValue())));
         return Optional.of(map);
       }
       return Optional.ofNullable(value.asRaw());
