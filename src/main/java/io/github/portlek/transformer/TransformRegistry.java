@@ -88,7 +88,7 @@ public final class TransformRegistry {
    */
   @NotNull
   public TransformRegistry withDefaultTransformers() {
-    io.github.portlek.transformer.transformer.TransformPack.DEFAULT.accept(this);
+    TransformPack.DEFAULT.accept(this);
     return this;
   }
 
@@ -113,7 +113,7 @@ public final class TransformRegistry {
    * @return {@code this} for builder chain.
    */
   @NotNull
-  public TransformRegistry withTransformPacks(@NotNull final io.github.portlek.transformer.transformer.TransformPack... packs) {
+  public TransformRegistry withTransformPacks(@NotNull final TransformPack... packs) {
     for (final var pack : packs) {
       pack.accept(this);
     }
