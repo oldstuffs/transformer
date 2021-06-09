@@ -25,10 +25,10 @@ import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@Comment({"header-1","header-2"})
+@Comment({"header-1", "header-2"})
 public final class Config extends TransformedObject {
 
-  @Comment({"test","test"})
+  @Comment({"test", "test"})
   public static String test = "test";
 
   public static void main(final String[] args) {
@@ -42,31 +42,31 @@ public final class Config extends TransformedObject {
 
   private static final class HJsonConfigurer extends TransformResolver {
 
-    private String commentPrefix = "# ";
+    @NotNull
+    private final String commentPrefix;
+
+    private final String sectionSeparator;
 
     private JsonObject json = new JsonObject();
 
-    private String sectionSeparator = SectionSeparator.NONE;
-
-    public HJsonConfigurer() {
-    }
-
-    public HJsonConfigurer(final String commentPrefix, final String sectionSeparator) {
+    private HJsonConfigurer(@NotNull final String commentPrefix, @NotNull final String sectionSeparator) {
       this.commentPrefix = commentPrefix;
       this.sectionSeparator = sectionSeparator;
     }
 
-    public HJsonConfigurer(final String commentPrefix) {
-      this.commentPrefix = commentPrefix;
+    private HJsonConfigurer(@NotNull final String commentPrefix) {
+      this(commentPrefix, SectionSeparator.NONE);
+    }
+
+    private HJsonConfigurer() {
+      this("# ");
     }
 
     @NotNull
     @Override
     public List<String> getAllKeys() {
       final var keys = new ArrayList<String>();
-      for (final var member : this.json) {
-        keys.add(member.getName());
-      }
+      this.json.forEach(member -> keys.add(member.getName()));
       return Collections.unmodifiableList(keys);
     }
 
@@ -77,12 +77,12 @@ public final class Config extends TransformedObject {
     }
 
     @Override
-    public void load(final @NotNull InputStream inputStream, final @NotNull TransformedObjectDeclaration declaration) {
+    public void load(@NotNull final InputStream inputStream, @NotNull final TransformedObjectDeclaration declaration) {
       this.json = JsonValue.readHjson(PostProcessor.of(inputStream).getContext()).asObject();
     }
 
     @Override
-    public boolean pathExists(final @NotNull String path) {
+    public boolean pathExists(@NotNull final String path) {
       return this.json.has(path);
     }
 
