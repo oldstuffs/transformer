@@ -36,11 +36,11 @@ public final class Config extends TransformedObject {
       .withFile(Path.of(System.getProperty("user.dir"))
         .resolve("target")
         .resolve("config.hjson"))
-      .withResolver(new HjsonConfigurer())
+      .withResolver(new HJsonConfigurer())
       .initiate();
   }
 
-  private static final class HjsonConfigurer extends TransformResolver {
+  private static final class HJsonConfigurer extends TransformResolver {
 
     private String commentPrefix = "# ";
 
@@ -48,15 +48,15 @@ public final class Config extends TransformedObject {
 
     private String sectionSeparator = SectionSeparator.NONE;
 
-    public HjsonConfigurer() {
+    public HJsonConfigurer() {
     }
 
-    public HjsonConfigurer(final String commentPrefix, final String sectionSeparator) {
+    public HJsonConfigurer(final String commentPrefix, final String sectionSeparator) {
       this.commentPrefix = commentPrefix;
       this.sectionSeparator = sectionSeparator;
     }
 
-    public HjsonConfigurer(final String commentPrefix) {
+    public HJsonConfigurer(final String commentPrefix) {
       this.commentPrefix = commentPrefix;
     }
 
@@ -104,7 +104,7 @@ public final class Config extends TransformedObject {
     public Map<Object, Object> serializeMap(@NotNull final Map<Object, Object> value,
                                             @Nullable final GenericDeclaration genericType, final boolean conservative)
       throws TransformException {
-      final var map = new LinkedHashMap<Object, Object>();
+      final var map = new LinkedHashMap<>();
       final var keyDeclaration = genericType == null
         ? null
         : genericType.getSubTypeAt(0).orElse(null);
