@@ -5,6 +5,7 @@ import eu.okaeri.hjson.JsonArray;
 import eu.okaeri.hjson.JsonObject;
 import eu.okaeri.hjson.JsonValue;
 import eu.okaeri.hjson.Stringify;
+import io.github.portlek.transformer.annotations.Comment;
 import io.github.portlek.transformer.declarations.FieldDeclaration;
 import io.github.portlek.transformer.declarations.GenericDeclaration;
 import io.github.portlek.transformer.declarations.TransformedObjectDeclaration;
@@ -24,8 +25,10 @@ import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@Comment({"header-1","header-2"})
 public final class Config extends TransformedObject {
 
+  @Comment({"test","test"})
   public static String test = "test";
 
   public static void main(final String[] args) {
@@ -128,7 +131,7 @@ public final class Config extends TransformedObject {
       this.addComments(this.json, declaration, null);
       final var header = declaration.getHeader();
       final var comments = header == null
-        ? new String[0]
+        ? null
         : header.value();
       final var comment = PostProcessor.createComment(this.commentPrefix, comments);
       this.json.setFullComment(CommentType.BOL, comment.isEmpty()
@@ -189,7 +192,7 @@ public final class Config extends TransformedObject {
         object.names().forEach(name -> map.put(name, this.fromJsonValue(object.get(name))));
         return Optional.of(map);
       }
-      return value.asRaw();
+      return Optional.ofNullable(value.asRaw());
     }
 
     @SuppressWarnings("unchecked")

@@ -34,7 +34,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * an annotation that puts comments to the field's path.
  */
-@Target(ElementType.FIELD)
+@Target({ElementType.FIELD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Comment {
 
@@ -44,5 +44,5 @@ public @interface Comment {
    * @return comments.
    */
   @NotNull
-  String @NotNull [] value();
+  String[] value();
 }

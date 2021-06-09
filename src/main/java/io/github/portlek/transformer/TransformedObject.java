@@ -187,10 +187,13 @@ public abstract class TransformedObject {
    */
   @NotNull
   public final TransformedObject createFile(@NotNull final Path path) throws IOException {
-    if (this.exists(this.getParent(path))) {
-      this.createDirectory(path);
+    final var parent = this.getParent(path);
+    if (!this.exists(parent)) {
+      this.createDirectory(parent);
     }
-    Files.createFile(path);
+    if (!this.exists(path)) {
+      Files.createFile(path);
+    }
     return this;
   }
 
@@ -541,7 +544,7 @@ public abstract class TransformedObject {
         true,
         StandardCharsets.UTF_8.name()));
     } catch (final Exception exception) {
-      throw new TransformException(String.format("Failed use #save with %s", path), exception);
+      throw new TransformException(String.format("Failed use #save(%s)", path), exception);
     }
   }
 
@@ -574,7 +577,7 @@ public abstract class TransformedObject {
     try {
       this.resolver.write(outputStream, this.declaration);
     } catch (final Exception exception) {
-      throw new TransformException("Failed use #write", exception);
+      throw new TransformException(String.format("Failed use #write(%s)", outputStream), exception);
     }
     return this;
   }

@@ -19,6 +19,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * a class that represents post processors.
@@ -77,7 +78,10 @@ public final class PostProcessor {
    * @return a newly created comment.
    */
   @NotNull
-  public static String createComment(@NotNull final String commentPrefix, @NotNull final String @NotNull [] comments) {
+  public static String createComment(@NotNull final String commentPrefix, @NotNull final String @Nullable [] comments) {
+    if (comments == null) {
+      return "";
+    }
     final var lines = Arrays.stream(comments)
       .map(line -> (line.isEmpty()
         ? "" : line.startsWith(commentPrefix.trim()) ? ""
