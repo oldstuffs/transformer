@@ -25,7 +25,7 @@
 
 package io.github.portlek.transformer.generics;
 
-import io.github.portlek.configs.transformer.declarations.GenericDeclaration;
+import io.github.portlek.transformer.declarations.GenericDeclaration;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

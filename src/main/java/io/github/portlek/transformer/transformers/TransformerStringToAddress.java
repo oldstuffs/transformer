@@ -25,7 +25,7 @@
 
 package io.github.portlek.transformer.transformers;
 
-import io.github.portlek.configs.transformer.TwoSideTransformer;
+import io.github.portlek.transformer.TwoSideTransformer;
 import java.math.BigDecimal;
 import java.net.InetSocketAddress;
 import org.jetbrains.annotations.NotNull;

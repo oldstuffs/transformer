@@ -25,7 +25,7 @@
 
 package io.github.portlek.transformer;
 
-import io.github.portlek.configs.transformer.declarations.GenericDeclaration;
+import io.github.portlek.transformer.declarations.GenericDeclaration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;

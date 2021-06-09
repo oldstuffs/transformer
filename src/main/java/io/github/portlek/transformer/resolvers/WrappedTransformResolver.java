@@ -25,11 +25,11 @@
 
 package io.github.portlek.transformer.resolvers;
 
-import io.github.portlek.configs.transformer.TransformResolver;
-import io.github.portlek.configs.transformer.declarations.FieldDeclaration;
-import io.github.portlek.configs.transformer.declarations.GenericDeclaration;
-import io.github.portlek.configs.transformer.declarations.TransformedObjectDeclaration;
-import io.github.portlek.configs.transformer.exceptions.TransformException;
+import io.github.portlek.transformer.TransformResolver;
+import io.github.portlek.transformer.declarations.FieldDeclaration;
+import io.github.portlek.transformer.declarations.GenericDeclaration;
+import io.github.portlek.transformer.declarations.TransformedObjectDeclaration;
+import io.github.portlek.transformer.exceptions.TransformException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
@@ -108,12 +108,6 @@ public abstract class WrappedTransformResolver extends TransformResolver {
   }
 
   @Override
-  public void setValue(@NotNull final String path, @Nullable final Object value,
-                       @Nullable final GenericDeclaration genericType, @Nullable final FieldDeclaration field) {
-    this.delegate.setValue(path, value, genericType, field);
-  }
-
-  @Override
   public List<?> serializeCollection(@NotNull final Collection<?> value, @Nullable final GenericDeclaration genericType,
                                      final boolean conservative) throws TransformException {
     return this.delegate.serializeCollection(value, genericType, conservative);
@@ -125,6 +119,12 @@ public abstract class WrappedTransformResolver extends TransformResolver {
                                           @Nullable final GenericDeclaration genericType, final boolean conservative)
     throws TransformException {
     return this.delegate.serializeMap(value, genericType, conservative);
+  }
+
+  @Override
+  public void setValue(@NotNull final String path, @Nullable final Object value,
+                       @Nullable final GenericDeclaration genericType, @Nullable final FieldDeclaration field) {
+    this.delegate.setValue(path, value, genericType, field);
   }
 
   @Override

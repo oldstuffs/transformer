@@ -25,11 +25,11 @@
 
 package io.github.portlek.transformer;
 
-import io.github.portlek.configs.transformer.declarations.TransformedObjectDeclaration;
-import io.github.portlek.configs.transformer.exceptions.TransformException;
 import io.github.portlek.reflection.RefConstructed;
 import io.github.portlek.reflection.RefField;
 import io.github.portlek.reflection.clazz.ClassOf;
+import io.github.portlek.transformer.declarations.TransformedObjectDeclaration;
+import io.github.portlek.transformer.exceptions.TransformException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;

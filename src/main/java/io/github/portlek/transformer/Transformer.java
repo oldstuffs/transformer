@@ -25,7 +25,7 @@
 
 package io.github.portlek.transformer;
 
-import io.github.portlek.configs.transformer.generics.GenericHolder;
+import io.github.portlek.transformer.generics.GenericHolder;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;

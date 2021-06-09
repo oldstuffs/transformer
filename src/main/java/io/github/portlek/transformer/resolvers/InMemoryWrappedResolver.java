@@ -25,9 +25,9 @@
 
 package io.github.portlek.transformer.resolvers;
 
-import io.github.portlek.configs.transformer.TransformResolver;
-import io.github.portlek.configs.transformer.declarations.FieldDeclaration;
-import io.github.portlek.configs.transformer.declarations.GenericDeclaration;
+import io.github.portlek.transformer.TransformResolver;
+import io.github.portlek.transformer.declarations.FieldDeclaration;
+import io.github.portlek.transformer.declarations.GenericDeclaration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

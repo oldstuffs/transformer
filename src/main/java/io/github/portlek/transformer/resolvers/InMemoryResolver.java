@@ -25,10 +25,10 @@
 
 package io.github.portlek.transformer.resolvers;
 
-import io.github.portlek.configs.transformer.TransformResolver;
-import io.github.portlek.configs.transformer.declarations.FieldDeclaration;
-import io.github.portlek.configs.transformer.declarations.GenericDeclaration;
-import io.github.portlek.configs.transformer.declarations.TransformedObjectDeclaration;
+import io.github.portlek.transformer.TransformResolver;
+import io.github.portlek.transformer.declarations.FieldDeclaration;
+import io.github.portlek.transformer.declarations.GenericDeclaration;
+import io.github.portlek.transformer.declarations.TransformedObjectDeclaration;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.LinkedHashMap;

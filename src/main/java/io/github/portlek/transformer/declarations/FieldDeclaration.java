@@ -25,11 +25,11 @@
 
 package io.github.portlek.transformer.declarations;
 
-import io.github.portlek.configs.transformer.annotations.Comment;
-import io.github.portlek.configs.transformer.annotations.Names;
-import io.github.portlek.configs.transformer.annotations.Variable;
-import io.github.portlek.configs.transformer.exceptions.TransformException;
 import io.github.portlek.reflection.RefField;
+import io.github.portlek.transformer.annotations.Comment;
+import io.github.portlek.transformer.annotations.Names;
+import io.github.portlek.transformer.annotations.Variable;
+import io.github.portlek.transformer.exceptions.TransformException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;

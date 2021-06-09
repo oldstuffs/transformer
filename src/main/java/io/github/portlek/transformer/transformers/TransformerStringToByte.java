@@ -25,7 +25,7 @@
 
 package io.github.portlek.transformer.transformers;
 
-import io.github.portlek.configs.transformer.Transformer;
+import io.github.portlek.transformer.Transformer;
 import java.math.BigDecimal;
 
 /**

@@ -25,9 +25,9 @@
 
 package io.github.portlek.transformer.transformers;
 
-import io.github.portlek.configs.transformer.TwoSideTransformer;
 import io.github.portlek.replaceable.RpBase;
 import io.github.portlek.replaceable.RpString;
+import io.github.portlek.transformer.TwoSideTransformer;
 
 /**
  * a class that represents transformers between {@link String} and {@link RpString}.

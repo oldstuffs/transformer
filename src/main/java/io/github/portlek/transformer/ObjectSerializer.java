@@ -25,7 +25,7 @@
 
 package io.github.portlek.transformer;
 
-import io.github.portlek.configs.transformer.declarations.GenericDeclaration;
+import io.github.portlek.transformer.declarations.GenericDeclaration;
 import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

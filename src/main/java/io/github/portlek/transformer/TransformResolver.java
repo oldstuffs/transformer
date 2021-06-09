@@ -25,12 +25,12 @@
 
 package io.github.portlek.transformer;
 
-import io.github.portlek.configs.transformer.declarations.FieldDeclaration;
-import io.github.portlek.configs.transformer.declarations.GenericDeclaration;
-import io.github.portlek.configs.transformer.declarations.TransformedObjectDeclaration;
-import io.github.portlek.configs.transformer.exceptions.TransformException;
-import io.github.portlek.configs.transformer.resolvers.InMemoryWrappedResolver;
 import io.github.portlek.reflection.clazz.ClassOf;
+import io.github.portlek.transformer.declarations.FieldDeclaration;
+import io.github.portlek.transformer.declarations.GenericDeclaration;
+import io.github.portlek.transformer.declarations.TransformedObjectDeclaration;
+import io.github.portlek.transformer.exceptions.TransformException;
+import io.github.portlek.transformer.resolvers.InMemoryWrappedResolver;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -61,7 +61,7 @@ public abstract class TransformResolver {
    * the registry.
    */
   @NotNull
-  private io.github.portlek.configs.transformer.TransformRegistry registry = new io.github.portlek.configs.transformer.TransformRegistry()
+  private io.github.portlek.transformer.transformer.TransformRegistry registry = new io.github.portlek.transformer.transformer.TransformRegistry()
     .withDefaultTransformers();
 
   /**
@@ -80,7 +80,7 @@ public abstract class TransformResolver {
    * @return registry.
    */
   @NotNull
-  public final io.github.portlek.configs.transformer.TransformRegistry getRegistry() {
+  public final io.github.portlek.transformer.transformer.TransformRegistry getRegistry() {
     return this.registry;
   }
 
@@ -105,7 +105,7 @@ public abstract class TransformResolver {
    * @return {@code this} for builder chain.
    */
   @NotNull
-  public final TransformResolver withRegistry(@NotNull final io.github.portlek.configs.transformer.TransformRegistry registry) {
+  public final TransformResolver withRegistry(@NotNull final io.github.portlek.transformer.transformer.TransformRegistry registry) {
     this.registry = registry;
     return this;
   }
@@ -118,7 +118,7 @@ public abstract class TransformResolver {
    * @return {@code this} for builder chain.
    */
   @NotNull
-  public final TransformResolver withTransformerPacks(@NotNull final io.github.portlek.configs.transformer.TransformPack... packs) {
+  public final TransformResolver withTransformerPacks(@NotNull final io.github.portlek.transformer.transformer.TransformPack... packs) {
     this.registry.withTransformPacks(packs);
     return this;
   }
@@ -203,7 +203,7 @@ public abstract class TransformResolver {
     }
     final var serializer = this.registry.getSerializer(targetClass);
     if (object instanceof Map && serializer.isPresent()) {
-      return serializer.get().deserialize(io.github.portlek.configs.transformer.TransformedData.deserialization(this, (Map<String, Object>) object), genericTarget)
+      return serializer.get().deserialize(io.github.portlek.transformer.transformer.TransformedData.deserialization(this, (Map<String, Object>) object), genericTarget)
         .map(targetClass::cast)
         .orElse(null);
     }
@@ -416,7 +416,7 @@ public abstract class TransformResolver {
     }
     //noinspection rawtypes
     final ObjectSerializer serializer = serializerOptional.get();
-    final var serializationData = io.github.portlek.configs.transformer.TransformedData.serialization(this);
+    final var serializationData = io.github.portlek.transformer.transformer.TransformedData.serialization(this);
     serializer.serialize(value, serializationData);
     final var serializationMap = serializationData.getSerializedMap();
     if (!conservative) {

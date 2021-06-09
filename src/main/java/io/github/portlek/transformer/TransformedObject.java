@@ -25,9 +25,9 @@
 
 package io.github.portlek.transformer;
 
-import io.github.portlek.configs.transformer.declarations.GenericDeclaration;
-import io.github.portlek.configs.transformer.declarations.TransformedObjectDeclaration;
-import io.github.portlek.configs.transformer.exceptions.TransformException;
+import io.github.portlek.transformer.declarations.GenericDeclaration;
+import io.github.portlek.transformer.declarations.TransformedObjectDeclaration;
+import io.github.portlek.transformer.exceptions.TransformException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -71,7 +71,7 @@ public abstract class TransformedObject {
    * the resolver.
    */
   @Nullable
-  private io.github.portlek.configs.transformer.TransformResolver resolver;
+  private io.github.portlek.transformer.transformer.TransformResolver resolver;
 
   /**
    * checks if the file exists or not.
@@ -91,7 +91,7 @@ public abstract class TransformedObject {
    * @throws TransformException if something goes wrong when getting the value as map.
    */
   @NotNull
-  public final Map<String, Object> asMap(@NotNull final io.github.portlek.configs.transformer.TransformResolver resolver, final boolean conservative)
+  public final Map<String, Object> asMap(@NotNull final io.github.portlek.transformer.transformer.TransformResolver resolver, final boolean conservative)
     throws TransformException {
     Objects.requireNonNull(this.declaration, "declaration");
     final var map = new LinkedHashMap<String, Object>();
@@ -515,7 +515,7 @@ public abstract class TransformedObject {
    * @return {@code this} for builder chain.
    */
   @NotNull
-  public final TransformedObject withResolver(@NotNull final io.github.portlek.configs.transformer.TransformResolver resolver) {
+  public final TransformedObject withResolver(@NotNull final io.github.portlek.transformer.transformer.TransformResolver resolver) {
     this.resolver = resolver;
     return this;
   }
@@ -528,7 +528,7 @@ public abstract class TransformedObject {
    * @return {@code this} for builder chain.
    */
   @NotNull
-  public final TransformedObject withTransformPack(@NotNull final io.github.portlek.configs.transformer.TransformPack pack) {
+  public final TransformedObject withTransformPack(@NotNull final io.github.portlek.transformer.transformer.TransformPack pack) {
     Objects.requireNonNull(this.resolver, "resolver").withTransformerPacks(pack);
     return this;
   }
@@ -541,7 +541,7 @@ public abstract class TransformedObject {
    * @return {@code this} for builder chain.
    */
   @NotNull
-  public final TransformedObject withTransformPack(@NotNull final Consumer<@NotNull io.github.portlek.configs.transformer.TransformRegistry> consumer) {
-    return this.withTransformPack(io.github.portlek.configs.transformer.TransformPack.create(consumer));
+  public final TransformedObject withTransformPack(@NotNull final Consumer<@NotNull io.github.portlek.transformer.transformer.TransformRegistry> consumer) {
+    return this.withTransformPack(io.github.portlek.transformer.transformer.TransformPack.create(consumer));
   }
 }
