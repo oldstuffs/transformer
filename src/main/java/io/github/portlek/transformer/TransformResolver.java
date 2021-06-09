@@ -316,12 +316,27 @@ public abstract class TransformResolver {
   }
 
   /**
+   * checks if the object can transform to string list.
+   *
+   * @param object the object to check.
+   * @param declaration the generic declaration to check.
+   *
+   * @return {@code true} if the object can be converted to string list.
+   */
+  public boolean isToStringListObject(@NotNull final Object object, @Nullable final GenericDeclaration declaration) {
+    if (object instanceof Class<?>) {
+      return this.registry.getTransformer(declaration, GenericDeclaration.of(List.class, String.class)).isPresent();
+    }
+    return this.isToStringListObject(object.getClass(), declaration);
+  }
+
+  /**
    * checks if the object can transform to string.
    *
    * @param object the object to check.
    * @param declaration the generic declaration to check.
    *
-   * @return {@code true} if the object can be converted tos string.
+   * @return {@code true} if the object can be converted to string.
    */
   public boolean isToStringObject(@NotNull final Object object, @Nullable final GenericDeclaration declaration) {
     if (object instanceof Class<?>) {
@@ -412,13 +427,16 @@ public abstract class TransformResolver {
       if (this.isToStringObject(serializerType, genericType)) {
         return this.deserialize(value, genericType, String.class, null, null);
       }
+      if (this.isToStringListObject(serializerType, genericType)) {
+        return this.deserialize(value, genericType, List.class, GenericDeclaration.of(List.class, String.class), null);
+      }
       if (value instanceof Collection<?>) {
         return this.serializeCollection((Collection<?>) value, genericType, conservative);
       }
       if (value instanceof Map<?, ?>) {
         return this.serializeMap((Map<Object, Object>) value, genericType, conservative);
       }
-      throw new TransformException(String.format("Cannot simplify type %s (%s): '%s' [%s]",
+      throw new TransformException(String.format("Cannot serialize type %s (%s): '%s' [%s]",
         serializerType, genericType, value, value.getClass()));
     }
     //noinspection rawtypes

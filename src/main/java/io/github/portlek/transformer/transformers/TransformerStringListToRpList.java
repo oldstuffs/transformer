@@ -28,6 +28,7 @@ package io.github.portlek.transformer.transformers;
 import io.github.portlek.replaceable.RpBase;
 import io.github.portlek.replaceable.RpList;
 import io.github.portlek.transformer.TwoSideTransformer;
+import io.github.portlek.transformer.declarations.GenericDeclaration;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -42,7 +43,7 @@ public final class TransformerStringListToRpList extends TwoSideTransformer.Base
    * ctor.
    */
   public TransformerStringListToRpList() {
-    super(List.class, RpList.class,
+    super(GenericDeclaration.of(List.class, String.class), GenericDeclaration.of(RpList.class),
       RpBase::getValue,
       RpList::fromObjects,
       (s, rpList) -> rpList.value(((List<?>) s).stream().map(Objects::toString).collect(Collectors.toList())));

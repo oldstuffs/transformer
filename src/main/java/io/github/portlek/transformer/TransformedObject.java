@@ -647,7 +647,8 @@ public abstract class TransformedObject {
       try {
         this.resolver.setValue(path, fieldValue, fieldDeclaration.getGenericDeclaration(), fieldDeclaration);
       } catch (final Exception exception) {
-        throw new TransformException(String.format("Failed to use #setValue for %s", path), exception);
+        throw new TransformException(String.format("Failed to use #setValue(%s, %s, %s, %s)",
+          path, fieldValue, fieldDeclaration.getGenericDeclaration(), fieldDeclaration), exception);
       }
     });
     try {

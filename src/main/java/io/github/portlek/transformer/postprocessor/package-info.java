@@ -22,16 +22,7 @@
  * SOFTWARE.
  *
  */
-
-package io.github.portlek.transformer.postprocessor;
-
-import java.util.function.Predicate;
-import org.jetbrains.annotations.NotNull;
-
 /**
- * a functional interface that filters lines.
+ * the package that contains post processing functions.
  */
-@FunctionalInterface
-public interface LineFilter extends Predicate<@NotNull String> {
-
-}
+package io.github.portlek.transformer.postprocessor;

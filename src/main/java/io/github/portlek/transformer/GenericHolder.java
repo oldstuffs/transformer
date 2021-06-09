@@ -23,8 +23,9 @@
  *
  */
 
-package io.github.portlek.transformer.generics;
+package io.github.portlek.transformer;
 
+import io.github.portlek.transformer.declarations.GenericDeclaration;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,22 @@ public interface GenericHolder<L, R> {
    */
   @NotNull
   static <L, R> GenericHolder<L, R> create(@NotNull final Class<L> left, @NotNull final Class<R> right) {
+    return GenericHolder.create(GenericDeclaration.of(left), GenericDeclaration.of(right));
+  }
+
+  /**
+   * creates a simple instance of {@code this}.
+   *
+   * @param left the left to create.
+   * @param right the right to create.
+   * @param <L> type of the left object class.
+   * @param <R> type of the right object class.
+   *
+   * @return a newly created {@code this} instance.
+   */
+  @NotNull
+  static <L, R> GenericHolder<L, R> create(@NotNull final GenericDeclaration left,
+                                           @NotNull final GenericDeclaration right) {
     return new Impl<>(left, right);
   }
 
@@ -59,7 +76,7 @@ public interface GenericHolder<L, R> {
    * @return left type.
    */
   @NotNull
-  Class<L> getLeftType();
+  GenericDeclaration getLeftType();
 
   /**
    * creates a new generic pair.
@@ -77,7 +94,7 @@ public interface GenericHolder<L, R> {
    * @return right type.
    */
   @NotNull
-  Class<R> getRightType();
+  GenericDeclaration getRightType();
 
   /**
    * a simple implementation of {@link GenericHolder}.
@@ -93,12 +110,12 @@ public interface GenericHolder<L, R> {
      * the left.
      */
     @NotNull
-    private final Class<L> leftType;
+    private final GenericDeclaration leftType;
 
     /**
      * the right.
      */
     @NotNull
-    private final Class<R> rightType;
+    private final GenericDeclaration rightType;
   }
 }

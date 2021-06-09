@@ -23,7 +23,7 @@
  *
  */
 
-package io.github.portlek.transformer.generics;
+package io.github.portlek.transformer;
 
 import io.github.portlek.transformer.declarations.GenericDeclaration;
 import lombok.AccessLevel;
@@ -77,7 +77,7 @@ public final class GenericPair {
    * @return a newly created generic pair.
    */
   @NotNull
-  public static GenericPair of(@Nullable final Class<?> left, @Nullable final Class<?> right) {
+  public static GenericPair of(@NotNull final Class<?> left, @NotNull final Class<?> right) {
     return GenericPair.of(GenericDeclaration.of(left), GenericDeclaration.of(right));
   }
 

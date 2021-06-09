@@ -25,7 +25,7 @@
 
 package io.github.portlek.transformer;
 
-import io.github.portlek.transformer.generics.GenericHolder;
+import io.github.portlek.transformer.declarations.GenericDeclaration;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -55,6 +55,26 @@ public interface TwoSideTransformer<R, F> extends Transformer<R, F> {
    */
   @NotNull
   static <R, F> TwoSideTransformer<R, F> create(@NotNull final Class<R> rawType, @NotNull final Class<F> finalType,
+                                                @NotNull final Function<@NotNull F, @Nullable R> toRaw,
+                                                @NotNull final Function<@NotNull R, @Nullable F> toFinal) {
+    return new Impl<>(rawType, finalType, toRaw, toFinal);
+  }
+
+  /**
+   * creates a simple transformer.
+   *
+   * @param rawType the raw type to create.
+   * @param finalType the final type to create.
+   * @param toRaw the to raw to create.
+   * @param toFinal the to final to create.
+   * @param <R> type of the raw value.
+   * @param <F> type of the final value.
+   *
+   * @return a newly created transformer.
+   */
+  @NotNull
+  static <R, F> TwoSideTransformer<R, F> create(@NotNull final GenericDeclaration rawType,
+                                                @NotNull final GenericDeclaration finalType,
                                                 @NotNull final Function<@NotNull F, @Nullable R> toRaw,
                                                 @NotNull final Function<@NotNull R, @Nullable F> toFinal) {
     return new Impl<>(rawType, finalType, toRaw, toFinal);
@@ -228,12 +248,42 @@ public interface TwoSideTransformer<R, F> extends Transformer<R, F> {
      * @param finalType the final type.
      * @param toRaw the to raw.
      * @param toFinal the to final.
+     * @param toFinalWithField the to final with field.
      */
-    protected Base(@NotNull final Class<R> rawType, @NotNull final Class<F> finalType,
+    protected Base(@NotNull final GenericDeclaration rawType, @NotNull final GenericDeclaration finalType,
+                   @NotNull final Function<@NotNull F, @Nullable R> toRaw,
+                   @NotNull final Function<@NotNull R, @Nullable F> toFinal,
+                   @NotNull final BiFunction<@NotNull R, @NotNull F, @Nullable F> toFinalWithField) {
+      this(GenericHolder.create(rawType, finalType), toRaw, toFinal, toFinalWithField);
+    }
+
+    /**
+     * ctor.
+     *
+     * @param rawType the raw type.
+     * @param finalType the final type.
+     * @param toRaw the to raw.
+     * @param toFinal the to final.
+     */
+    protected Base(@NotNull final GenericDeclaration rawType, @NotNull final GenericDeclaration finalType,
                    @NotNull final Function<@NotNull F, @Nullable R> toRaw,
                    @NotNull final Function<@NotNull R, @Nullable F> toFinal) {
       this(GenericHolder.create(rawType, finalType), toRaw, toFinal,
         (r, field) -> toFinal.apply(r));
+    }
+
+    /**
+     * ctor.
+     *
+     * @param rawType the raw type.
+     * @param finalType the final type.
+     * @param toRaw the to raw.
+     * @param toFinal the to final.
+     */
+    protected Base(@NotNull final Class<R> rawType, @NotNull final Class<F> finalType,
+                   @NotNull final Function<@NotNull F, @Nullable R> toRaw,
+                   @NotNull final Function<@NotNull R, @Nullable F> toFinal) {
+      this(GenericDeclaration.of(rawType), GenericDeclaration.of(finalType), toRaw, toFinal);
     }
 
     /**
@@ -286,12 +336,13 @@ public interface TwoSideTransformer<R, F> extends Transformer<R, F> {
      * @param finalType the final type.
      * @param toRaw the to raw.
      * @param toFinal the to final.
+     * @param toFinalWithField the to final with field.
      */
-    private Impl(@NotNull final Class<R> rawType, @NotNull final Class<F> finalType,
+    private Impl(@NotNull final GenericDeclaration rawType, @NotNull final GenericDeclaration finalType,
                  @NotNull final Function<@NotNull F, @Nullable R> toRaw,
-                 @NotNull final Function<@NotNull R, @Nullable F> toFinal) {
-      super(rawType, finalType, toRaw, toFinal,
-        (r, field) -> toFinal.apply(r));
+                 @NotNull final Function<@NotNull R, @Nullable F> toFinal,
+                 @NotNull final BiFunction<@NotNull R, @NotNull F, @Nullable F> toFinalWithField) {
+      super(rawType, finalType, toRaw, toFinal, toFinalWithField);
     }
 
     /**
@@ -307,7 +358,36 @@ public interface TwoSideTransformer<R, F> extends Transformer<R, F> {
                  @NotNull final Function<@NotNull F, @Nullable R> toRaw,
                  @NotNull final Function<@NotNull R, @Nullable F> toFinal,
                  @NotNull final BiFunction<@NotNull R, @NotNull F, @Nullable F> toFinalWithField) {
-      super(rawType, finalType, toRaw, toFinal, toFinalWithField);
+      this(GenericDeclaration.of(rawType), GenericDeclaration.of(finalType), toRaw, toFinal, toFinalWithField);
+    }
+
+    /**
+     * ctor.
+     *
+     * @param rawType the raw type.
+     * @param finalType the final type.
+     * @param toRaw the to raw.
+     * @param toFinal the to final.
+     */
+    private Impl(@NotNull final GenericDeclaration rawType, @NotNull final GenericDeclaration finalType,
+                 @NotNull final Function<@NotNull F, @Nullable R> toRaw,
+                 @NotNull final Function<@NotNull R, @Nullable F> toFinal) {
+      this(rawType, finalType, toRaw, toFinal,
+        (r, field) -> toFinal.apply(r));
+    }
+
+    /**
+     * ctor.
+     *
+     * @param rawType the raw type.
+     * @param finalType the final type.
+     * @param toRaw the to raw.
+     * @param toFinal the to final.
+     */
+    private Impl(@NotNull final Class<R> rawType, @NotNull final Class<F> finalType,
+                 @NotNull final Function<@NotNull F, @Nullable R> toRaw,
+                 @NotNull final Function<@NotNull R, @Nullable F> toFinal) {
+      this(GenericDeclaration.of(rawType), GenericDeclaration.of(finalType), toRaw, toFinal);
     }
   }
 }

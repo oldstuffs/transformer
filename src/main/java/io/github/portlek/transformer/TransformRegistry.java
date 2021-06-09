@@ -26,9 +26,8 @@
 package io.github.portlek.transformer;
 
 import io.github.portlek.transformer.declarations.GenericDeclaration;
-import io.github.portlek.transformer.generics.GenericPair;
 import io.github.portlek.transformer.transformers.TransformerObjectToString;
-import java.util.Arrays;
+import io.github.portlek.transformer.transformers.TransformerStringListToRpList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -208,10 +207,8 @@ public final class TransformRegistry {
   public TransformRegistry withTwoSideTransformers(@NotNull final TwoSideTransformer<?, ?>... transformers) {
     for (final var transformer : transformers) {
       this.withTransformer(transformer.getPair(), transformer);
+      this.withTransformer(transformer.reverse().getPair(), transformer.reverse());
     }
-    Arrays.stream(transformers)
-      .map(TwoSideTransformer::reverse)
-      .forEach(transformer -> this.withTransformer(transformer.getPair(), transformer));
     return this;
   }
 

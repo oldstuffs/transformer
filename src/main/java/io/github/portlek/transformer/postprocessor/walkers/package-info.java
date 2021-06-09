@@ -23,6 +23,6 @@
  *
  */
 /**
- * the package that contains classes for generics.
+ * the package that contains section walker implementations.
  */
-package io.github.portlek.transformer.generics;
+package io.github.portlek.transformer.postprocessor.walkers;

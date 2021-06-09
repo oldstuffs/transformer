@@ -74,6 +74,18 @@ public abstract class WrappedTransformResolver extends TransformResolver {
     return this.delegate.getValue(path);
   }
 
+  @NotNull
+  @Override
+  public <T> Optional<T> getValue(@NotNull final String path, @NotNull final Class<T> cls,
+                                  @Nullable final GenericDeclaration genericType, @Nullable final Object defaultValue) {
+    return this.delegate.getValue(path, cls, genericType, defaultValue);
+  }
+
+  @Override
+  public boolean isToStringListObject(@NotNull final Object object, @Nullable final GenericDeclaration declaration) {
+    return this.delegate.isToStringListObject(object, declaration);
+  }
+
   @Override
   public boolean isToStringObject(@NotNull final Object object, @Nullable final GenericDeclaration declaration) {
     return this.delegate.isToStringObject(object, declaration);
