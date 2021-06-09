@@ -192,13 +192,16 @@ public final class Config extends TransformedObject {
       }
       if (value instanceof JsonArray) {
         final var values = new ArrayList<>();
-        ((JsonArray) value).forEach(item -> values.add(this.fromJsonValue(item)));
+        ((JsonArray) value).forEach(item ->
+          this.fromJsonValue(item).ifPresent(values::add));
         return Optional.of(values);
       }
       if (value instanceof JsonObject) {
         final var map = new LinkedHashMap<String, Object>();
         final var object = (JsonObject) value;
-        object.forEach(member -> map.put(member.getName(), this.fromJsonValue(member.getValue())));
+        object.forEach(member ->
+          this.fromJsonValue(member.getValue()).ifPresent(memberValue ->
+            map.put(member.getName(), memberValue)));
         return Optional.of(map);
       }
       return Optional.ofNullable(value.asRaw());
