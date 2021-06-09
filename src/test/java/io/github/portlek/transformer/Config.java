@@ -43,7 +43,6 @@ public final class Config extends TransformedObject {
         .resolve("config.hjson"))
       .withResolver(new HJsonConfigurer())
       .initiate();
-    System.out.println(config.get("test"));
   }
 
   private static final class HJsonConfigurer extends TransformResolver {
