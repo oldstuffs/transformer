@@ -1,11 +1,14 @@
 package io.github.portlek.transformer;
 
 import eu.okaeri.hjson.CommentType;
+import eu.okaeri.hjson.HjsonOptions;
 import eu.okaeri.hjson.JsonArray;
 import eu.okaeri.hjson.JsonObject;
 import eu.okaeri.hjson.JsonValue;
 import eu.okaeri.hjson.Stringify;
+import io.github.portlek.replaceable.RpString;
 import io.github.portlek.transformer.annotations.Comment;
+import io.github.portlek.transformer.annotations.Names;
 import io.github.portlek.transformer.declarations.FieldDeclaration;
 import io.github.portlek.transformer.declarations.GenericDeclaration;
 import io.github.portlek.transformer.declarations.TransformedObjectDeclaration;
@@ -26,10 +29,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @Comment({"header-1", "header-2"})
+@Names(modifier = Names.Modifier.TO_LOWER_CASE, strategy = Names.Strategy.HYPHEN_CASE)
 public final class Config extends TransformedObject {
 
   @Comment({"test", "test"})
-  public static String test = "test";
+  public static RpString test = RpString.from("test")
+    .regex("%test%");
 
   public static void main(final String[] args) {
     TransformerPool.create(Config.class)
@@ -42,6 +47,9 @@ public final class Config extends TransformedObject {
   }
 
   private static final class HJsonConfigurer extends TransformResolver {
+
+    private static final HjsonOptions READ_OPTIONS = new HjsonOptions()
+      .setOutputComments(true);
 
     @NotNull
     private final String commentPrefix;
@@ -79,7 +87,7 @@ public final class Config extends TransformedObject {
 
     @Override
     public void load(@NotNull final InputStream inputStream, @NotNull final TransformedObjectDeclaration declaration) {
-      this.json = JsonValue.readHjson(PostProcessor.of(inputStream).getContext()).asObject();
+      this.json = JsonValue.readHjson(PostProcessor.of(inputStream).getContext(), HJsonConfigurer.READ_OPTIONS).asObject();
     }
 
     @Override
@@ -141,7 +149,7 @@ public final class Config extends TransformedObject {
       PostProcessor.of(this.json.toString(Stringify.HJSON_COMMENTS)).write(outputStream);
     }
 
-    private void addComments(@NotNull final Object object, @NotNull final TransformedObjectDeclaration declaration,
+    private void addComments(@NotNull final JsonValue object, @NotNull final TransformedObjectDeclaration declaration,
                              @Nullable final String path) {
       final var field = declaration.getFields().get(path);
       if (object instanceof JsonObject) {
@@ -150,19 +158,19 @@ public final class Config extends TransformedObject {
           jsonObject.names().forEach(name ->
             this.addComments(jsonObject.get(name), declaration, name));
         } else {
+          final var transformedObjectDeclaration = TransformedObjectDeclaration.of(field.getGenericDeclaration().getType());
           jsonObject.names().forEach(name ->
             this.addComments(
               jsonObject.get(name),
-              TransformedObjectDeclaration.of(field.getGenericDeclaration().getType()),
+              transformedObjectDeclaration,
               name));
         }
       }
       if (object instanceof JsonArray && field != null) {
         final var arrayType = field.getGenericDeclaration().getSubTypeAt(0).orElse(null);
-        final var configDeclaration = TransformedObjectDeclaration.of(arrayType.getType());
-        ((JsonArray) object).forEach(item -> this.addComments(item, configDeclaration, null));
+        final var transformedObjectDeclaration = TransformedObjectDeclaration.of(arrayType.getType());
+        ((JsonArray) object).forEach(item -> this.addComments(item, transformedObjectDeclaration, null));
       }
-      final var value = (JsonValue) object;
       if (field == null) {
         return;
       }
@@ -171,7 +179,7 @@ public final class Config extends TransformedObject {
         return;
       }
       final var comments = PostProcessor.createComment(this.commentPrefix, comment.value());
-      value.setFullComment(CommentType.BOL, comments.isEmpty()
+      object.setFullComment(CommentType.BOL, comments.isEmpty()
         ? ""
         : this.sectionSeparator + comments);
     }

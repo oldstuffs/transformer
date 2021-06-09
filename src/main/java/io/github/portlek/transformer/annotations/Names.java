@@ -56,7 +56,7 @@ public @interface Names {
    *
    * @return strategy
    */
-  Strategy strategy();
+  Strategy strategy() default Strategy.IDENTITY;
 
   /**
    * an enum class that contains name modifiers.
