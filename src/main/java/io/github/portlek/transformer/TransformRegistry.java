@@ -27,7 +27,6 @@ package io.github.portlek.transformer;
 
 import io.github.portlek.transformer.declarations.GenericDeclaration;
 import io.github.portlek.transformer.transformers.TransformerObjectToString;
-import io.github.portlek.transformer.transformers.TransformerStringListToRpList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
