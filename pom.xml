@@ -47,11 +47,5 @@
       <groupId>org.jetbrains</groupId>
       <artifactId>annotations</artifactId>
     </dependency>
-    <dependency>
-      <groupId>eu.okaeri</groupId>
-      <artifactId>okaeri-hjson</artifactId>
-      <version>4.0.0</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 </project>
