@@ -202,11 +202,18 @@ public abstract class TransformResolver {
         this.deserialize(object, source, Map.class, GenericDeclaration.of(Map.class, String.class, Object.class), defaultValue)));
       return (T) transformedObject.update();
     }
-    final var serializer = this.registry.getSerializer(targetClass);
-    if (object instanceof Map && serializer.isPresent()) {
-      return serializer.get().deserialize(TransformedData.deserialization(this, (Map<String, Object>) object), genericTarget)
-        .map(targetClass::cast)
-        .orElse(null);
+    final var serializerOptional = this.registry.getSerializer(targetClass);
+    if (object instanceof Map && serializerOptional.isPresent()) {
+      final var deserialization = TransformedData.deserialization(this, (Map<String, Object>) object);
+      //noinspection rawtypes
+      final ObjectSerializer serializer = serializerOptional.get();
+      final Optional<?> value;
+      if (defaultValue == null) {
+        value = serializer.deserialize(deserialization, genericTarget);
+      } else {
+        value = serializer.deserialize(defaultValue, deserialization, genericTarget);
+      }
+      return value.map(targetClass::cast).orElse(null);
     }
     if (genericTarget != null) {
       if (object instanceof Collection<?> && Collection.class.isAssignableFrom(targetClass)) {

@@ -26,6 +26,8 @@
 package io.github.portlek.transformer;
 
 import io.github.portlek.transformer.declarations.GenericDeclaration;
+import java.text.MessageFormat;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -86,6 +88,77 @@ public final class TransformedData {
   @NotNull
   public static TransformedData serialization(@NotNull final TransformResolver resolver) {
     return new TransformedData(new ConcurrentHashMap<>(), resolver, true, new ConcurrentHashMap<>());
+  }
+
+  /**
+   * adds the value to the path.
+   *
+   * @param path the path to add.
+   * @param value the value to add.
+   */
+  public void add(@NotNull final String path, @NotNull final Object value) {
+    this.serializedMap.put(path, this.resolver.serialize(value, null, true));
+  }
+
+  /**
+   * adds the value to the path.
+   *
+   * @param path the path to add.
+   * @param value the value to add.
+   * @param cls the cls to add.
+   * @param <T> type of the value class.
+   */
+  public <T> void add(@NotNull final String path, @NotNull final Object value, @NotNull final Class<T> cls) {
+    this.serializedMap.put(path, this.resolver.serialize(
+      value,
+      GenericDeclaration.of(cls),
+      true));
+  }
+
+  /**
+   * adds the map to the path.
+   *
+   * @param path the path to add.
+   * @param map the map to add.
+   * @param keyClass the key class to add.
+   * @param valueClass the value class to add.
+   * @param <K> type of the key class.
+   * @param <V> type of the value class.
+   */
+  @SuppressWarnings("unchecked")
+  public <K, V> void addAsMap(@NotNull final String path, @NotNull final Map<K, V> map,
+                              @NotNull final Class<K> keyClass, @NotNull final Class<V> valueClass) {
+    this.serializedMap.put(path, this.resolver.serializeMap(
+      (Map<Object, Object>) map,
+      GenericDeclaration.of(map.getClass(), keyClass, valueClass),
+      true));
+  }
+
+  /**
+   * adds the collection to the path.
+   *
+   * @param path the path to add.
+   * @param collection the collection to add.
+   * @param elementClass the element class to add.
+   * @param <T> type of the element class.
+   */
+  public <T> void addCollection(@NotNull final String path, @NotNull final Collection<T> collection,
+                                @NotNull final Class<T> elementClass) {
+    this.serializedMap.put(path, this.resolver.serializeCollection(
+      collection,
+      GenericDeclaration.of(collection.getClass(), elementClass),
+      true));
+  }
+
+  /**
+   * adds formatted string to the path.
+   *
+   * @param path the path to add.
+   * @param format the format to add.
+   * @param args the args to add.
+   */
+  public void addFormatted(@NotNull final String path, @NotNull final String format, @NotNull final Object... args) {
+    this.add(path, MessageFormat.format(format, args));
   }
 
   /**
@@ -163,7 +236,6 @@ public final class TransformedData {
    *
    * @return obtained map value.
    */
-  @SuppressWarnings("unchecked")
   @NotNull
   public <K, V> Optional<Map<K, V>> getAsMap(@NotNull final String key, @NotNull final Class<K> keyClass,
                                              @NotNull final Class<V> valueClass) {
@@ -180,6 +252,16 @@ public final class TransformedData {
       Map.class,
       GenericDeclaration.of(Map.class, keyClass, valueClass),
       null));
+  }
+
+  /**
+   * obtains deserialized map.
+   *
+   * @return deserialized map.
+   */
+  @NotNull
+  public Map<String, Object> getDeserializedMap() {
+    return Collections.unmodifiableMap(this.deserializedMap);
   }
 
   /**

@@ -58,10 +58,8 @@ public interface ObjectSerializer<T> {
    * @return deserialized object.
    */
   @NotNull
-  default Optional<T> deserialize(@NotNull final T field, @NotNull final TransformedData transformedData,
-                                  @NotNull final GenericDeclaration declaration) {
-    return this.deserialize(transformedData, declaration);
-  }
+  Optional<T> deserialize(@NotNull T field, @NotNull TransformedData transformedData,
+                          @Nullable GenericDeclaration declaration);
 
   /**
    * serializes the object.
