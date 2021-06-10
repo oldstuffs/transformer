@@ -68,6 +68,14 @@ public final class InMemoryWrappedResolver extends WrappedTransformResolver {
     return Optional.ofNullable(this.map.get(path));
   }
 
+  @NotNull
+  @Override
+  public <T> Optional<T> getValue(@NotNull final String path, @NotNull final Class<T> cls,
+                                  @Nullable final GenericDeclaration genericType, @Nullable final Object defaultValue) {
+    return this.getValue(path)
+      .map(value -> this.deserialize(value, GenericDeclaration.of(value), cls, genericType, defaultValue));
+  }
+
   @Override
   public boolean pathExists(@NotNull final String path) {
     return this.map.containsKey(path);
