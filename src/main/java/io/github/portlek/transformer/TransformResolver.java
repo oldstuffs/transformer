@@ -309,8 +309,7 @@ public abstract class TransformResolver {
    */
   @NotNull
   public <T> Optional<T> getValue(@NotNull final String path, @NotNull final Class<T> cls,
-                                  @Nullable final GenericDeclaration genericType,
-                                  @Nullable final Object defaultValue) {
+                                  @Nullable final GenericDeclaration genericType, @Nullable final Object defaultValue) {
     return this.getValue(path)
       .map(value -> this.deserialize(value, GenericDeclaration.of(value), cls, genericType, defaultValue));
   }
