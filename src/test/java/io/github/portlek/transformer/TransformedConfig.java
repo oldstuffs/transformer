@@ -13,6 +13,11 @@ public class TransformedConfig extends TransformedObject {
     .regex("%test%");
 
   @Comment({"header-1", "header-2"})
+  public static TestData testData = new TestData(s -> {
+    System.out.println(s);
+  }, 100, "test data");
+
+  @Comment({"header-1", "header-2"})
   public static Test testSection = new Test();
 
   public static final class Test extends TransformedObject {

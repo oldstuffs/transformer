@@ -33,6 +33,8 @@ public final class Config extends TransformedObject {
         .resolve("target")
         .resolve("config.hjson"))
       .withResolver(new HJsonConfigurer())
+      .withTransformPack(registry -> registry
+        .withSerializers(new TestData.Serializer()))
       .initiate();
   }
 
