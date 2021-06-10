@@ -28,7 +28,6 @@ package io.github.portlek.transformer.transformers;
 import io.github.portlek.replaceable.RpBase;
 import io.github.portlek.replaceable.RpList;
 import io.github.portlek.transformer.TwoSideTransformer;
-import io.github.portlek.transformer.declarations.GenericDeclaration;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
