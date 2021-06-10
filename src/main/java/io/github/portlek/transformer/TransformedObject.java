@@ -77,6 +77,13 @@ public abstract class TransformedObject {
   private TransformResolver resolver;
 
   /**
+   * ctor.
+   */
+  protected TransformedObject() {
+    this.withDeclaration(TransformedObjectDeclaration.of(this));
+  }
+
+  /**
    * get values as map.
    *
    * @param resolver the resolver to get.
