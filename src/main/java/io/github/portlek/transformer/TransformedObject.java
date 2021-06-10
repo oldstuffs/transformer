@@ -32,7 +32,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -74,6 +73,7 @@ public abstract class TransformedObject {
    * the resolver.
    */
   @Nullable
+  @Getter
   private TransformResolver resolver;
 
   /**
@@ -239,7 +239,7 @@ public abstract class TransformedObject {
   public final TransformedObject createFileUnchecked(@NotNull final Path path) {
     try {
       this.createFile(path);
-    } catch (final IOException e) {
+    } catch (final Exception e) {
       e.printStackTrace();
     }
     return this;
@@ -447,8 +447,8 @@ public abstract class TransformedObject {
     if (this.exists(path)) {
       return this.load(path, update);
     }
-    this.createFileUnchecked(path);
-    return this.save(path);
+    return this.save(path)
+      .load(path, false);
   }
 
   /**
@@ -536,11 +536,11 @@ public abstract class TransformedObject {
   public final TransformedObject load(@NotNull final Path path, final boolean update) throws TransformException {
     try {
       this.load(new FileInputStream(path.toFile()));
-    } catch (final FileNotFoundException exception) {
+      if (update) {
+        this.save(path);
+      }
+    } catch (final Exception exception) {
       throw new TransformException(String.format("Failed use #load(%s)", path), exception);
-    }
-    if (update) {
-      this.save(path);
     }
     return this;
   }
@@ -576,10 +576,10 @@ public abstract class TransformedObject {
     Objects.requireNonNull(this.declaration, "declaration");
     try {
       this.resolver.load(inputStream, this.declaration);
+      return this.update();
     } catch (final Exception exception) {
       throw new TransformException(String.format("Failed use #load(%s)", inputStream), exception);
     }
-    return this.update();
   }
 
   /**
