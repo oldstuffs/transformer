@@ -37,7 +37,7 @@ public final class Config extends TransformedObject {
     .regex("%test%");
 
   public static void main(final String[] args) {
-    final var config = TransformerPool.create(Config.class)
+    TransformerPool.create(Config.class)
       .withFile(Path.of(System.getProperty("user.dir"))
         .resolve("target")
         .resolve("config.hjson"))
