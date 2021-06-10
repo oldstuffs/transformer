@@ -6,9 +6,6 @@ import eu.okaeri.hjson.JsonArray;
 import eu.okaeri.hjson.JsonObject;
 import eu.okaeri.hjson.JsonValue;
 import eu.okaeri.hjson.Stringify;
-import io.github.portlek.replaceable.RpList;
-import io.github.portlek.transformer.annotations.Comment;
-import io.github.portlek.transformer.annotations.Names;
 import io.github.portlek.transformer.declarations.FieldDeclaration;
 import io.github.portlek.transformer.declarations.GenericDeclaration;
 import io.github.portlek.transformer.declarations.TransformedObjectDeclaration;
@@ -28,16 +25,10 @@ import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@Comment({"header-1", "header-2"})
-@Names(modifier = Names.Modifier.TO_LOWER_CASE, strategy = Names.Strategy.HYPHEN_CASE)
 public final class Config extends TransformedObject {
 
-  @Comment({"test", "test"})
-  public static RpList test = RpList.from("%test%-1", "%test%-2", "%test%-3")
-    .regex("%test%");
-
   public static void main(final String[] args) {
-    TransformerPool.create(Config.class)
+    TransformerPool.create(TransformedConfig.class)
       .withFile(Path.of(System.getProperty("user.dir"))
         .resolve("target")
         .resolve("config.hjson"))
