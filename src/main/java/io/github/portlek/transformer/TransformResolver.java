@@ -322,11 +322,11 @@ public abstract class TransformResolver {
    *
    * @return {@code true} if the object can be converted to string list.
    */
-  public boolean isToStringListObject(@NotNull final Object object, @Nullable final GenericDeclaration declaration) {
+  public boolean isToListObject(@NotNull final Object object, @Nullable final GenericDeclaration declaration) {
     if (object instanceof Class<?>) {
-      return this.registry.getTransformer(declaration, GenericDeclaration.of(List.class, String.class)).isPresent();
+      return this.registry.getTransformer(declaration, GenericDeclaration.ofReady(List.class)).isPresent();
     }
-    return this.isToStringListObject(object.getClass(), declaration);
+    return this.isToListObject(object.getClass(), declaration);
   }
 
   /**
@@ -426,8 +426,8 @@ public abstract class TransformResolver {
       if (this.isToStringObject(serializerType, genericType)) {
         return this.deserialize(value, genericType, String.class, null, null);
       }
-      if (this.isToStringListObject(serializerType, genericType)) {
-        return this.deserialize(value, genericType, List.class, GenericDeclaration.of(List.class, String.class), null);
+      if (this.isToListObject(serializerType, genericType)) {
+        return this.deserialize(value, genericType, List.class, GenericDeclaration.ofReady(List.class), null);
       }
       if (value instanceof Collection<?>) {
         return this.serializeCollection((Collection<?>) value, genericType, conservative);

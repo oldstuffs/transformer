@@ -82,8 +82,8 @@ public abstract class WrappedTransformResolver extends TransformResolver {
   }
 
   @Override
-  public boolean isToStringListObject(@NotNull final Object object, @Nullable final GenericDeclaration declaration) {
-    return this.delegate.isToStringListObject(object, declaration);
+  public boolean isToListObject(@NotNull final Object object, @Nullable final GenericDeclaration declaration) {
+    return this.delegate.isToListObject(object, declaration);
   }
 
   @Override

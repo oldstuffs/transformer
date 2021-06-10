@@ -43,7 +43,7 @@ public final class TransformerStringListToRpList extends TwoSideTransformer.Base
    * ctor.
    */
   public TransformerStringListToRpList() {
-    super(GenericDeclaration.of(List.class, String.class), GenericDeclaration.ofReady(RpList.class),
+    super(List.class, RpList.class,
       RpBase::getValue,
       RpList::fromObjects,
       (s, rpList) -> rpList.value(((List<?>) s).stream().map(Objects::toString).collect(Collectors.toList())));

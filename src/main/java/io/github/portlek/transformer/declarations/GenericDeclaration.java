@@ -262,9 +262,9 @@ public final class GenericDeclaration {
   @NotNull
   public static GenericDeclaration of(@NotNull final Object object) {
     if (object instanceof Class<?>) {
-      return GenericDeclaration.ofReady((Class<?>) object);
+      return GenericDeclaration.of((Class<?>) object);
     }
-    return GenericDeclaration.ofReady(object.getClass());
+    return GenericDeclaration.of(object.getClass());
   }
 
   /**
