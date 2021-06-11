@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 public final class Config extends TransformedObject {
 
   public static void main(final String[] args) {
-    TransformerPool.create(TransformedConfig.class)
+    final var config = TransformerPool.create(TransformedConfig.class)
       .withFile(Path.of(System.getProperty("user.dir"))
         .resolve("target")
         .resolve("config.hjson"))
@@ -36,6 +36,9 @@ public final class Config extends TransformedObject {
       .withTransformPack(registry -> registry
         .withSerializers(new TestData.Serializer()))
       .initiate();
+    config.set("tesssssss", "tesssssss");
+    TransformedConfig.testSection.set("testtt", "testttt");
+    config.save();
   }
 
   private static final class HJsonConfigurer extends TransformResolver {

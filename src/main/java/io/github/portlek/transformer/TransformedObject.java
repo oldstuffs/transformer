@@ -107,10 +107,9 @@ public abstract class TransformedObject {
     }
     this.resolver.getAllKeys().stream()
       .filter(keyName -> !map.containsKey(keyName))
-      .forEach(keyName -> {
-        final var value = this.resolver.getValue(keyName);
-        map.put(keyName, this.resolver.serialize(value, GenericDeclaration.of(value), conservative));
-      });
+      .forEach(keyName ->
+        this.resolver.getValue(keyName).ifPresent(value ->
+          map.put(keyName, this.resolver.serialize(value, GenericDeclaration.of(value), conservative))));
     return map;
   }
 
