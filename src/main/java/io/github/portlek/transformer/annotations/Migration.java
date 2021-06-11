@@ -6,16 +6,18 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * an annotation to define transformer version.
+ * an annotation to define migrated version of the field.
  */
-@Target(ElementType.TYPE)
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface TransformerVersion {
+public @interface Migration {
 
   /**
-   * obtains the transformer version.
+   * obtains the migrated version.
    *
-   * @return transformer version.
+   * does not affect 
+   *
+   * @return migrated version.
    */
-  int value() default 1;
+  int value() default -1;
 }
