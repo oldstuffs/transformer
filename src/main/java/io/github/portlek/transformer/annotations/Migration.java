@@ -14,10 +14,12 @@ public @interface Migration {
 
   /**
    * obtains the migrated version.
-   *
-   * does not affect 
+   * <p>
+   * does not affect if the value is 0 or lower.
+   * <p>
+   * removes the path when the value become {@link Version#value()} of the current class.
    *
    * @return migrated version.
    */
-  int value() default -1;
+  int value() default 0;
 }

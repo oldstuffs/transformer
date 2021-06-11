@@ -27,6 +27,7 @@ package io.github.portlek.transformer.declarations;
 
 import io.github.portlek.reflection.RefField;
 import io.github.portlek.transformer.annotations.Comment;
+import io.github.portlek.transformer.annotations.Migration;
 import io.github.portlek.transformer.annotations.Names;
 import io.github.portlek.transformer.annotations.Variable;
 import io.github.portlek.transformer.exceptions.TransformException;
@@ -74,6 +75,12 @@ public final class FieldDeclaration {
   private final GenericDeclaration genericDeclaration;
 
   /**
+   * the migration.
+   */
+  @Nullable
+  private final Migration migration;
+
+  /**
    * the object.
    */
   @Nullable
@@ -110,18 +117,20 @@ public final class FieldDeclaration {
    * @param comment the comment.
    * @param field the field.
    * @param genericDeclaration the generic declaration.
+   * @param migration the migration.
    * @param object the object.
    * @param path the path.
    * @param variable the variable.
    * @param startingValue the starting value.
    */
   private FieldDeclaration(@Nullable final Comment comment, @NotNull final RefField field,
-                           @NotNull final GenericDeclaration genericDeclaration, @Nullable final Object object,
-                           @NotNull final String path, @Nullable final Variable variable,
+                           @NotNull final GenericDeclaration genericDeclaration, @Nullable final Migration migration,
+                           @Nullable final Object object, @NotNull final String path, @Nullable final Variable variable,
                            @Nullable final Object startingValue) {
     this.comment = comment;
     this.field = field;
     this.genericDeclaration = genericDeclaration;
+    this.migration = migration;
     this.object = object;
     this.path = path;
     this.variable = variable;
@@ -146,6 +155,7 @@ public final class FieldDeclaration {
         field.getAnnotation(Comment.class).orElse(null),
         field,
         GenericDeclaration.of(field),
+        field.getAnnotation(Migration.class).orElse(null),
         object,
         Names.Calculated.calculatePath(parent, field),
         field.getAnnotation(Variable.class).orElse(null),

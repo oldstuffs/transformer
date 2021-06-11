@@ -29,8 +29,10 @@ import io.github.portlek.reflection.clazz.ClassOf;
 import io.github.portlek.transformer.TransformedObject;
 import io.github.portlek.transformer.annotations.Comment;
 import io.github.portlek.transformer.annotations.Exclude;
-import io.github.portlek.transformer.annotations.Version;
 import io.github.portlek.transformer.annotations.Names;
+import io.github.portlek.transformer.annotations.Version;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -66,12 +68,6 @@ public final class TransformedObjectDeclaration {
   private final Map<String, FieldDeclaration> fields;
 
   /**
-   * the transformer version.
-   */
-  @Nullable
-  private final Version version;
-
-  /**
    * the header.
    */
   @Nullable
@@ -82,6 +78,12 @@ public final class TransformedObjectDeclaration {
    */
   @NotNull
   private final Class<?> objectClass;
+
+  /**
+   * the transformer version.
+   */
+  @Nullable
+  private final Version version;
 
   /**
    * creates a new transformed object declaration.
@@ -104,9 +106,9 @@ public final class TransformedObjectDeclaration {
           .collect(Collectors.toMap(FieldDeclaration::getPath, Function.identity(), (f1, f2) -> {
             throw new IllegalStateException(String.format("Duplicate key %s", f1));
           }, LinkedHashMap::new)),
-        classOf.getAnnotation(Version.class).orElse(null),
         classOf.getAnnotation(Comment.class).orElse(null),
-        clazz);
+        clazz,
+        classOf.getAnnotation(Version.class).orElse(null));
     });
   }
 
@@ -132,5 +134,49 @@ public final class TransformedObjectDeclaration {
   @NotNull
   public static TransformedObjectDeclaration of(@NotNull final Class<?> cls) {
     return TransformedObjectDeclaration.of(cls, null);
+  }
+
+  /**
+   * obtains the all fields.
+   *
+   * @return all fields.
+   */
+  @NotNull
+  public Map<String, FieldDeclaration> getAllFields() {
+    return Collections.unmodifiableMap(this.fields);
+  }
+
+  /**
+   * obtains the migrated fields.
+   *
+   * @return migrated fields.
+   */
+  @NotNull
+  public Map<String, FieldDeclaration> getMigratedFields() {
+    final var map = new HashMap<String, FieldDeclaration>();
+    this.fields.forEach((s, fieldDeclaration) -> {
+      if (fieldDeclaration.getMigration() != null &&
+        fieldDeclaration.getMigration().value() > 0) {
+        map.put(s, fieldDeclaration);
+      }
+    });
+    return Collections.unmodifiableMap(map);
+  }
+
+  /**
+   * obtains the non migrated fields.
+   *
+   * @return non migrated fields.
+   */
+  @NotNull
+  public Map<String, FieldDeclaration> getNonMigratedFields() {
+    final var map = new HashMap<String, FieldDeclaration>();
+    this.fields.forEach((s, fieldDeclaration) -> {
+      if (fieldDeclaration.getMigration() == null ||
+        fieldDeclaration.getMigration().value() <= 0) {
+        map.put(s, fieldDeclaration);
+      }
+    });
+    return Collections.unmodifiableMap(map);
   }
 }
