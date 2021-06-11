@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.Getter;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -51,37 +52,26 @@ import org.jetbrains.annotations.Nullable;
 public abstract class TransformResolver {
 
   /**
+   * the current object.
+   */
+  @Nullable
+  @Getter
+  private TransformedObject currentObject;
+
+  /**
    * the parent object.
    */
   @Nullable
+  @Getter
   private TransformedObject parentObject;
 
   /**
    * the registry.
    */
   @NotNull
+  @Getter
   private TransformRegistry registry = new TransformRegistry()
     .withDefaultTransformers();
-
-  /**
-   * obtains the parent object.
-   *
-   * @return parent object.
-   */
-  @Nullable
-  public final TransformedObject getParentObject() {
-    return this.parentObject;
-  }
-
-  /**
-   * obtains the registry.
-   *
-   * @return registry.
-   */
-  @NotNull
-  public final TransformRegistry getRegistry() {
-    return this.registry;
-  }
 
   /**
    * sets the parent object.
@@ -93,6 +83,19 @@ public abstract class TransformResolver {
   @NotNull
   public final TransformResolver withParentObject(@Nullable final TransformedObject parentObject) {
     this.parentObject = parentObject;
+    return this;
+  }
+
+  /**
+   * sets the current object.
+   *
+   * @param currentObject the current object to set.
+   *
+   * @return {@code this} for builder chain.
+   */
+  @NotNull
+  public final TransformResolver withCurrentObject(@Nullable final TransformedObject currentObject) {
+    this.currentObject = currentObject;
     return this;
   }
 
@@ -136,7 +139,7 @@ public abstract class TransformResolver {
    */
   @SuppressWarnings("unchecked")
   @Nullable
-  @Contract("null, _, _, _, _-> null; !null, _, _, _, _ -> !null")
+  @Contract("null, _, _, _, _ -> null; !null, _, _, _, _ -> !null")
   public <T> T deserialize(@Nullable final Object object, @Nullable final GenericDeclaration genericSource,
                            @NotNull final Class<T> targetClass, @Nullable final GenericDeclaration genericTarget,
                            @Nullable final Object defaultValue)
@@ -154,7 +157,6 @@ public abstract class TransformResolver {
       target = GenericDeclaration.ofReady(target.toWrapper().orElse(null));
     }
     final var objectClass = object.getClass();
-    final var objectClassOf = new ClassOf<>(objectClass);
     try {
       if (object instanceof String && target.isEnum()) {
         final var targetClassOf = new ClassOf<>(targetClass);
@@ -168,10 +170,9 @@ public abstract class TransformResolver {
         } catch (final Exception e) {
           final var enumValues = (Enum<?>[]) targetClass.getEnumConstants();
           for (final var value : enumValues) {
-            if (!stringObject.equalsIgnoreCase(value.name())) {
-              continue;
+            if (stringObject.equalsIgnoreCase(value.name())) {
+              return targetClass.cast(value);
             }
-            return targetClass.cast(value);
           }
         }
         final var error = String.format("no enum value for name %s (available: %s)",
@@ -181,7 +182,8 @@ public abstract class TransformResolver {
         throw new TransformException(error);
       }
       if (source.isEnum() && targetClass == String.class) {
-        final var name = objectClassOf.getMethodByName("name")
+        final var name = new ClassOf<>(objectClass)
+          .getMethodByName("name")
           .orElseThrow()
           .of(object)
           .call()
@@ -191,19 +193,20 @@ public abstract class TransformResolver {
         return targetClass.cast(name);
       }
     } catch (final Exception exception) {
-      final var error = String.format("Failed to resolve enum %s <> %s",
-        object.getClass(), targetClass);
-      throw new RuntimeException(error, exception);
+      throw new RuntimeException(String.format("Failed to resolve enum %s <> %s",
+        object.getClass(), targetClass), exception);
     }
     if (TransformedObject.class.isAssignableFrom(targetClass)) {
       final var transformedObject = TransformerPool.create((Class<? extends TransformedObject>) targetClass);
-      transformedObject.withResolver(new InMemoryWrappedResolver(
-        this,
-        this.deserialize(object, source, Map.class, GenericDeclaration.of(Map.class, String.class, Object.class), defaultValue)));
-      return (T) transformedObject.update();
+      return (T) transformedObject
+        .withResolver(new InMemoryWrappedResolver(
+          this,
+          this.deserialize(object, source, Map.class, GenericDeclaration.of(Map.class, String.class, Object.class), defaultValue))
+          .withParentObject(this.currentObject))
+        .update();
     }
     final var serializerOptional = this.registry.getSerializer(targetClass);
-    if (object instanceof Map && serializerOptional.isPresent()) {
+    if (object instanceof Map<?, ?> && serializerOptional.isPresent()) {
       final var deserialization = TransformedData.deserialization(this, (Map<String, Object>) object);
       //noinspection rawtypes
       final ObjectSerializer serializer = serializerOptional.get();
@@ -217,36 +220,32 @@ public abstract class TransformResolver {
     }
     if (genericTarget != null) {
       if (object instanceof Collection<?> && Collection.class.isAssignableFrom(targetClass)) {
-        final var sourceList = (Collection<?>) object;
-        final var targetList = (Collection<Object>) TransformerPool.createInstance(targetClass);
         final var declaration = genericTarget.getSubTypeAt(0).orElseThrow(() ->
           new TransformException(String.format("Something went wrong when getting sub types(0) of %s", genericTarget)));
         if (declaration.getType() == null) {
           throw new TransformException(String.format("Something went wrong when getting type of %s", genericTarget));
         }
-        for (final var item : sourceList) {
-          targetList.add(this.deserialize(item, GenericDeclaration.of(item), declaration.getType(), declaration, defaultValue));
-        }
+        final var targetList = (Collection<Object>) TransformerPool.createInstance(targetClass);
+        ((Collection<?>) object).stream()
+          .map(item -> this.deserialize(item, GenericDeclaration.of(item), declaration.getType(), declaration, defaultValue))
+          .forEach(targetList::add);
         return targetClass.cast(targetList);
       }
       if (object instanceof Map<?, ?> && Map.class.isAssignableFrom(targetClass)) {
-        final var values = (Map<Object, Object>) object;
         final var keyDeclaration = genericTarget.getSubTypeAt(0).orElseThrow(() ->
           new TransformException(String.format("Something went wrong when getting sub types(0) of %s", genericTarget)));
-        final var valueDeclaration = genericTarget.getSubTypeAt(1).orElseThrow(() ->
-          new TransformException(String.format("Something went wrong when getting sub types(1) of %s", genericTarget)));
         if (keyDeclaration.getType() == null) {
           throw new TransformException(String.format("Something went wrong when getting type of %s", keyDeclaration));
         }
+        final var valueDeclaration = genericTarget.getSubTypeAt(1).orElseThrow(() ->
+          new TransformException(String.format("Something went wrong when getting sub types(1) of %s", genericTarget)));
         if (valueDeclaration.getType() == null) {
           throw new TransformException(String.format("Something went wrong when getting type of %s", valueDeclaration));
         }
         final var map = (Map<Object, Object>) TransformerPool.createInstance(targetClass);
-        for (final var entry : values.entrySet()) {
-          map.put(
-            this.deserialize(entry.getKey(), GenericDeclaration.of(entry.getKey()), keyDeclaration.getType(), keyDeclaration, defaultValue),
-            this.deserialize(entry.getValue(), GenericDeclaration.of(entry.getValue()), valueDeclaration.getType(), valueDeclaration, defaultValue));
-        }
+        ((Map<Object, Object>) object).forEach((key, value) -> map.put(
+          this.deserialize(key, GenericDeclaration.of(key), keyDeclaration.getType(), keyDeclaration, defaultValue),
+          this.deserialize(value, GenericDeclaration.of(value), valueDeclaration.getType(), valueDeclaration, defaultValue)));
         return targetClass.cast(map);
       }
     }
@@ -288,9 +287,9 @@ public abstract class TransformResolver {
    */
   @NotNull
   public List<String> getAllKeys() {
-    return this.parentObject == null
+    return this.currentObject == null
       ? Collections.emptyList()
-      : this.parentObject.getAllKeys();
+      : this.currentObject.getAllKeys();
   }
 
   /**
@@ -470,8 +469,10 @@ public abstract class TransformResolver {
    *
    * @throws TransformException if something goes wrong when simplifying the value.
    */
+  @NotNull
   public List<?> serializeCollection(@NotNull final Collection<?> value, @Nullable final GenericDeclaration genericType,
-                                     final boolean conservative) throws TransformException {
+                                     final boolean conservative)
+    throws TransformException {
     final var collectionSubtype = genericType == null
       ? null
       : genericType.getSubTypeAt(0).orElse(null);
@@ -494,7 +495,8 @@ public abstract class TransformResolver {
   @NotNull
   public Map<Object, Object> serializeMap(@NotNull final Map<Object, Object> value,
                                           @Nullable final GenericDeclaration genericType,
-                                          final boolean conservative) throws TransformException {
+                                          final boolean conservative)
+    throws TransformException {
     final var keyDeclaration = genericType == null
       ? null
       : genericType.getSubTypeAt(0).orElse(null);

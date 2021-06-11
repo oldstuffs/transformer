@@ -26,6 +26,7 @@
 package io.github.portlek.transformer.declarations;
 
 import io.github.portlek.reflection.RefField;
+import io.github.portlek.transformer.TransformResolver;
 import io.github.portlek.transformer.TransformedObject;
 import io.github.portlek.transformer.annotations.Comment;
 import io.github.portlek.transformer.annotations.Migration;
@@ -35,6 +36,7 @@ import io.github.portlek.transformer.exceptions.TransformException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.IntStream;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -187,8 +189,72 @@ public final class FieldDeclaration {
    *
    * @param value the value to set.
    */
-  public void setValue(@NotNull final Object value) {
+  public void setValue(@Nullable final Object value) {
     this.field.of(this.object).setValue(value);
+  }
+
+  /**
+   * checks if field is migrated.
+   *
+   * @param declaration the declaration to get version from.
+   *
+   * @return {@code true} if field is migrated.
+   */
+  public boolean isMigrated(@NotNull final TransformedObjectDeclaration declaration) {
+    return this.isMigrated(declaration.getVersionInteger());
+  }
+
+  /**
+   * checks if field is migrated.
+   *
+   * @param version the version to check.
+   *
+   * @return {@code true} if field is migrated.
+   */
+  public boolean isMigrated(final int version) {
+    return this.migration != null && version >= this.migration.value();
+  }
+
+  /**
+   * checks if field is not migrated.
+   *
+   * @param declaration the declaration to get version from.
+   *
+   * @return {@code true} if field is not migrated.
+   */
+  public boolean isNotMigrated(@NotNull final TransformedObjectDeclaration declaration) {
+    return !this.isMigrated(declaration);
+  }
+
+  /**
+   * checks if field is migrated.
+   *
+   * @param version the version to check.
+   *
+   * @return {@code true} if field is migrated.
+   */
+  public boolean isNotMigrated(final int version) {
+    return !this.isMigrated(version);
+  }
+
+  /**
+   * removes the field from the path if it was migrated already.
+   *
+   * @param fileVersion the file version to remove.
+   * @param declaration the declaration to remove.
+   * @param resolver the resolver to remove.
+   */
+  public void removeIfMigrated(final int fileVersion, @NotNull final TransformedObjectDeclaration declaration,
+                               @NotNull final TransformResolver resolver) {
+    final var version = declaration.getVersion();
+    if (this.migration == null ||
+      this.migration.value() <= 0 ||
+      version == null ||
+      IntStream.range(fileVersion, version.value()).noneMatch(value -> value == this.migration.value())) {
+      return;
+    }
+    this.setValue(null);
+    resolver.setValue(this.path, null, this.genericDeclaration, this);
   }
 
   /**

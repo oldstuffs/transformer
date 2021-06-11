@@ -32,16 +32,15 @@ import io.github.portlek.transformer.annotations.Exclude;
 import io.github.portlek.transformer.annotations.Names;
 import io.github.portlek.transformer.annotations.Version;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import lombok.AccessLevel;
+import java.util.stream.IntStream;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -49,10 +48,8 @@ import org.jetbrains.annotations.Nullable;
 /**
  * a class that represents transformed class declarations.
  */
-@Getter
 @ToString
 @EqualsAndHashCode
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TransformedObjectDeclaration {
 
   /**
@@ -71,19 +68,40 @@ public final class TransformedObjectDeclaration {
    * the header.
    */
   @Nullable
+  @Getter
   private final Comment header;
 
   /**
    * the object class.
    */
   @NotNull
+  @Getter
   private final Class<?> objectClass;
 
   /**
    * the transformer version.
    */
   @Nullable
-  private final Version version;
+  @Getter
+  @Setter
+  private Version version;
+
+  /**
+   * ctor.
+   *
+   * @param fields the fields.
+   * @param header the header.
+   * @param objectClass the object class.
+   * @param version the version.
+   */
+  private TransformedObjectDeclaration(@NotNull final Map<String, FieldDeclaration> fields,
+                                       @Nullable final Comment header, @NotNull final Class<?> objectClass,
+                                       @Nullable final Version version) {
+    this.fields = fields;
+    this.header = header;
+    this.objectClass = objectClass;
+    this.version = version;
+  }
 
   /**
    * creates a new transformed object declaration.
@@ -137,9 +155,9 @@ public final class TransformedObjectDeclaration {
   }
 
   /**
-   * obtains the all fields.
+   * obtains the fields.
    *
-   * @return all fields.
+   * @return fields.
    */
   @NotNull
   public Map<String, FieldDeclaration> getAllFields() {
@@ -153,14 +171,9 @@ public final class TransformedObjectDeclaration {
    */
   @NotNull
   public Map<String, FieldDeclaration> getMigratedFields() {
-    final var map = new HashMap<String, FieldDeclaration>();
-    this.fields.forEach((s, fieldDeclaration) -> {
-      if (fieldDeclaration.getMigration() != null &&
-        fieldDeclaration.getMigration().value() > 0) {
-        map.put(s, fieldDeclaration);
-      }
-    });
-    return Collections.unmodifiableMap(map);
+    return this.fields.entrySet().stream()
+      .filter(entry -> entry.getValue().isMigrated(this))
+      .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
   /**
@@ -170,13 +183,17 @@ public final class TransformedObjectDeclaration {
    */
   @NotNull
   public Map<String, FieldDeclaration> getNonMigratedFields() {
-    final var map = new HashMap<String, FieldDeclaration>();
-    this.fields.forEach((s, fieldDeclaration) -> {
-      if (fieldDeclaration.getMigration() == null ||
-        fieldDeclaration.getMigration().value() <= 0) {
-        map.put(s, fieldDeclaration);
-      }
-    });
-    return Collections.unmodifiableMap(map);
+    return this.fields.entrySet().stream()
+      .filter(entry -> entry.getValue().isNotMigrated(this))
+      .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
+  }
+
+  /**
+   * obtains the version as integer.
+   *
+   * @return version as integer.
+   */
+  public int getVersionInteger() {
+    return this.version == null ? 1 : this.version.value();
   }
 }

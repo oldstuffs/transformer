@@ -99,7 +99,7 @@ public abstract class TransformedObject {
     throws TransformException {
     Objects.requireNonNull(this.declaration, "declaration");
     final var map = new LinkedHashMap<String, Object>();
-    this.declaration.getFields().forEach((key, fieldDeclaration) -> map.put(
+    this.declaration.getNonMigratedFields().forEach((key, fieldDeclaration) -> map.put(
       fieldDeclaration.getPath(),
       resolver.serialize(fieldDeclaration.getValue(), fieldDeclaration.getGenericDeclaration(), conservative)));
     if (this.resolver == null) {
@@ -293,7 +293,7 @@ public abstract class TransformedObject {
   public final <T> Optional<T> get(@NotNull final String path, @NotNull final Class<T> cls) {
     Objects.requireNonNull(this.resolver, "resolver");
     Objects.requireNonNull(this.declaration, "declaration");
-    final var field = this.declaration.getFields().get(path);
+    final var field = this.declaration.getNonMigratedFields().get(path);
     if (field == null) {
       return this.resolver.getValue(path, cls, null, null);
     }
@@ -319,7 +319,7 @@ public abstract class TransformedObject {
   public final Optional<Object> get(@NotNull final String path) {
     Objects.requireNonNull(this.resolver, "resolver");
     Objects.requireNonNull(this.declaration, "declaration");
-    final var field = this.declaration.getFields().get(path);
+    final var field = this.declaration.getNonMigratedFields().get(path);
     if (field != null) {
       return Optional.ofNullable(field.getValue());
     }
@@ -333,7 +333,7 @@ public abstract class TransformedObject {
    */
   @NotNull
   public final List<String> getAllKeys() {
-    return new ArrayList<>(Objects.requireNonNull(this.declaration, "declaration").getFields().keySet());
+    return new ArrayList<>(Objects.requireNonNull(this.declaration, "declaration").getNonMigratedFields().keySet());
   }
 
   /**
@@ -443,11 +443,10 @@ public abstract class TransformedObject {
    */
   @NotNull
   public final TransformedObject initiate(@NotNull final Path path, final boolean update) throws TransformException {
-    if (this.exists(path)) {
-      return this.load(path, update);
+    if (!this.exists(path)) {
+      this.createFileUnchecked(path);
     }
-    return this.save(path)
-      .load(path, false);
+    return this.load(path, update);
   }
 
   /**
@@ -582,6 +581,25 @@ public abstract class TransformedObject {
   }
 
   /**
+   * removes the value at path.
+   *
+   * @param path the path to remove.
+   *
+   * @return {@code this} for builder chain.
+   */
+  @NotNull
+  public final TransformedObject remove(@NotNull final String path) {
+    Objects.requireNonNull(this.resolver, "resolver");
+    Objects.requireNonNull(this.declaration, "declaration");
+    final var field = this.declaration.getNonMigratedFields().get(path);
+    if (field != null) {
+      field.setValue(null);
+    }
+    this.resolver.setValue(path, null, field == null ? null : field.getGenericDeclaration(), field);
+    return this;
+  }
+
+  /**
    * saves the objects into the {@link #path}.
    *
    * @return {@code this} for builder chain.
@@ -643,7 +661,7 @@ public abstract class TransformedObject {
   public final TransformedObject save(@NotNull final OutputStream outputStream) throws TransformException {
     Objects.requireNonNull(this.declaration, "declaration");
     Objects.requireNonNull(this.resolver, "resolver");
-    this.declaration.getFields().forEach((key, fieldDeclaration) -> {
+    this.declaration.getNonMigratedFields().forEach((key, fieldDeclaration) -> {
       final var path = fieldDeclaration.getPath();
       final var fieldValue = fieldDeclaration.getValue();
       if (!this.resolver.isValid(fieldDeclaration, fieldValue)) {
@@ -731,10 +749,11 @@ public abstract class TransformedObject {
    *
    * @return {@code this} for builder chain.
    */
+  @NotNull
   public final TransformedObject set(@NotNull final String path, @NotNull final Object value) {
     Objects.requireNonNull(this.resolver, "resolver");
     Objects.requireNonNull(this.declaration, "declaration");
-    final var field = this.declaration.getFields().get(path);
+    final var field = this.declaration.getNonMigratedFields().get(path);
     var tempValue = value;
     if (field != null) {
       final var declaration = field.getGenericDeclaration();
@@ -752,12 +771,29 @@ public abstract class TransformedObject {
    * updates the transformed object.
    *
    * @return {@code this} for builder chain.
+   *
+   * @throws NullPointerException if {@link #declaration} is null.
+   * @throws NullPointerException if {@link #resolver} is null.
    */
   @NotNull
   public final TransformedObject update() {
     Objects.requireNonNull(this.declaration, "declaration");
     Objects.requireNonNull(this.resolver, "resolver");
-    this.declaration.getFields().forEach((key, fieldDeclaration) -> {
+    Optional.ofNullable(this.resolver.getParentObject())
+      .map(TransformedObject::getDeclaration)
+      .map(TransformedObjectDeclaration::getVersion)
+      .ifPresent(this.declaration::setVersion);
+    final int fileVersion;
+    if (this.resolver.getAllKeys().contains("file-version")) {
+      fileVersion = this.get("file-version", int.class).orElseThrow(() ->
+        new TransformException("Something went wrong when getting the version."));
+    } else {
+      fileVersion = 1;
+      this.set("file-version", 1);
+    }
+    this.declaration.getAllFields().forEach((s, fieldDeclaration) ->
+      fieldDeclaration.removeIfMigrated(fileVersion, this.declaration, this.resolver));
+    this.declaration.getNonMigratedFields().forEach((key, fieldDeclaration) -> {
       final var fieldPath = fieldDeclaration.getPath();
       final var genericType = fieldDeclaration.getGenericDeclaration();
       final var type = Objects.requireNonNull(genericType.getType(), "type");
@@ -838,6 +874,7 @@ public abstract class TransformedObject {
    *
    * @return {@code this} for builder chain.
    */
+  @NotNull
   public final TransformedObject withFile(@NotNull final String path) {
     return this.withFile(Path.of(path));
   }
@@ -849,6 +886,7 @@ public abstract class TransformedObject {
    *
    * @return {@code this} for builder chain.
    */
+  @NotNull
   public final TransformedObject withFile(@NotNull final Path path) {
     this.path = path;
     return this;
@@ -863,7 +901,7 @@ public abstract class TransformedObject {
    */
   @NotNull
   public final TransformedObject withResolver(@NotNull final TransformResolver resolver) {
-    this.resolver = resolver;
+    this.resolver = resolver.withCurrentObject(this);
     return this;
   }
 

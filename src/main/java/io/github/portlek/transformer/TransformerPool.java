@@ -103,7 +103,7 @@ public final class TransformerPool {
    * @throws TransformException if something goes wrong when creating the instance.
    */
   @NotNull
-  public static Object createInstance(@NotNull final Class<?> cls) throws TransformException {
+  static Object createInstance(@NotNull final Class<?> cls) throws TransformException {
     try {
       if (Collection.class.isAssignableFrom(cls)) {
         if (cls == Set.class) {

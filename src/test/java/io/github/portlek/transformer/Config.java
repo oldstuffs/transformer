@@ -36,9 +36,6 @@ public final class Config extends TransformedObject {
       .withTransformPack(registry -> registry
         .withSerializers(new TestData.Serializer()))
       .initiate();
-    config.set("tesssssss", "tesssssss");
-    TransformedConfig.testSection.set("testtt", "testttt");
-    config.save();
   }
 
   private static final class HJsonConfigurer extends TransformResolver {
@@ -146,7 +143,7 @@ public final class Config extends TransformedObject {
 
     private void addComments(@NotNull final JsonValue object, @NotNull final TransformedObjectDeclaration declaration,
                              @Nullable final String path) {
-      final var field = declaration.getFields().get(path);
+      final var field = declaration.getNonMigratedFields().get(path);
       if (object instanceof JsonObject) {
         final var jsonObject = (JsonObject) object;
         if (field == null) {
