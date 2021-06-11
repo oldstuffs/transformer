@@ -29,6 +29,7 @@ import io.github.portlek.reflection.clazz.ClassOf;
 import io.github.portlek.transformer.TransformedObject;
 import io.github.portlek.transformer.annotations.Comment;
 import io.github.portlek.transformer.annotations.Exclude;
+import io.github.portlek.transformer.annotations.TransformerVersion;
 import io.github.portlek.transformer.annotations.Names;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -65,6 +66,12 @@ public final class TransformedObjectDeclaration {
   private final Map<String, FieldDeclaration> fields;
 
   /**
+   * the transformer version.
+   */
+  @Nullable
+  private final TransformerVersion transformerVersion;
+
+  /**
    * the header.
    */
   @Nullable
@@ -97,6 +104,7 @@ public final class TransformedObjectDeclaration {
           .collect(Collectors.toMap(FieldDeclaration::getPath, Function.identity(), (f1, f2) -> {
             throw new IllegalStateException(String.format("Duplicate key %s", f1));
           }, LinkedHashMap::new)),
+        classOf.getAnnotation(TransformerVersion.class).orElse(null),
         classOf.getAnnotation(Comment.class).orElse(null),
         clazz);
     });
