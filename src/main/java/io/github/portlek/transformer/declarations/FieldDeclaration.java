@@ -26,6 +26,7 @@
 package io.github.portlek.transformer.declarations;
 
 import io.github.portlek.reflection.RefField;
+import io.github.portlek.transformer.TransformedObject;
 import io.github.portlek.transformer.annotations.Comment;
 import io.github.portlek.transformer.annotations.Migration;
 import io.github.portlek.transformer.annotations.Names;
@@ -84,7 +85,7 @@ public final class FieldDeclaration {
    * the object.
    */
   @Nullable
-  private final Object object;
+  private final TransformedObject object;
 
   /**
    * the path.
@@ -125,8 +126,8 @@ public final class FieldDeclaration {
    */
   private FieldDeclaration(@Nullable final Comment comment, @NotNull final RefField field,
                            @NotNull final GenericDeclaration genericDeclaration, @Nullable final Migration migration,
-                           @Nullable final Object object, @NotNull final String path, @Nullable final Variable variable,
-                           @Nullable final Object startingValue) {
+                           @Nullable final TransformedObject object, @NotNull final String path,
+                           @Nullable final Variable variable, @Nullable final Object startingValue) {
     this.comment = comment;
     this.field = field;
     this.genericDeclaration = genericDeclaration;
@@ -148,7 +149,7 @@ public final class FieldDeclaration {
    * @return a newly created field declaration.
    */
   @NotNull
-  public static FieldDeclaration of(@Nullable final Names parent, @Nullable final Object object,
+  public static FieldDeclaration of(@Nullable final Names parent, @Nullable final TransformedObject object,
                                     @NotNull final Class<?> cls, @NotNull final RefField field) {
     return FieldDeclaration.CACHES.computeIfAbsent(Key.of(cls, field.getName()), cache ->
       new FieldDeclaration(
