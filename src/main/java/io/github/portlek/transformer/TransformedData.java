@@ -184,19 +184,7 @@ public final class TransformedData {
    */
   @NotNull
   public <T> Optional<T> get(@NotNull final String key, @NotNull final Class<T> objectClass) {
-    if (this.canSerialize()) {
-      return Optional.empty();
-    }
-    final var object = this.deserializedMap.get(key);
-    if (object == null) {
-      return Optional.empty();
-    }
-    return Optional.of(this.resolver.deserialize(
-      object,
-      GenericDeclaration.of(object),
-      objectClass,
-      null,
-      null));
+    return this.get(key, objectClass, null);
   }
 
   /**
@@ -211,7 +199,7 @@ public final class TransformedData {
    */
   @NotNull
   public <T> Optional<T> get(@NotNull final String key, @NotNull final Class<T> objectClass,
-                             @NotNull final T defaultValue) {
+                             @Nullable final T defaultValue) {
     if (this.canSerialize()) {
       return Optional.empty();
     }
