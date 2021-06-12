@@ -74,19 +74,6 @@ public abstract class TransformResolver {
     .withDefaultTransformers();
 
   /**
-   * sets the parent object.
-   *
-   * @param parentObject the parent object to set.
-   *
-   * @return {@code this} for builder chain.
-   */
-  @NotNull
-  public final TransformResolver withParentObject(@Nullable final TransformedObject parentObject) {
-    this.parentObject = parentObject;
-    return this;
-  }
-
-  /**
    * sets the current object.
    *
    * @param currentObject the current object to set.
@@ -96,6 +83,19 @@ public abstract class TransformResolver {
   @NotNull
   public final TransformResolver withCurrentObject(@Nullable final TransformedObject currentObject) {
     this.currentObject = currentObject;
+    return this;
+  }
+
+  /**
+   * sets the parent object.
+   *
+   * @param parentObject the parent object to set.
+   *
+   * @return {@code this} for builder chain.
+   */
+  @NotNull
+  public final TransformResolver withParentObject(@Nullable final TransformedObject parentObject) {
+    this.parentObject = parentObject;
     return this;
   }
 
@@ -386,6 +386,16 @@ public abstract class TransformResolver {
   public boolean pathExists(@NotNull final String path) {
     return this.getValue(path).isPresent();
   }
+
+  /**
+   * removes the value to path.
+   *
+   * @param path the path to remove.
+   * @param genericType the generic type to remove.
+   * @param field the field to remove.
+   */
+  public abstract void removeValue(@NotNull String path, @Nullable GenericDeclaration genericType,
+                                   @Nullable FieldDeclaration field);
 
   /**
    * serializes the object.

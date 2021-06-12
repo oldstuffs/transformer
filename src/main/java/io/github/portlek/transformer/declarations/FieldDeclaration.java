@@ -238,26 +238,6 @@ public final class FieldDeclaration {
   }
 
   /**
-   * removes the field from the path if it was migrated already.
-   *
-   * @param fileVersion the file version to remove.
-   * @param declaration the declaration to remove.
-   * @param resolver the resolver to remove.
-   */
-  public void removeIfMigrated(final int fileVersion, @NotNull final TransformedObjectDeclaration declaration,
-                               @NotNull final TransformResolver resolver) {
-    final var version = declaration.getVersion();
-    if (this.migration == null ||
-      this.migration.value() <= 0 ||
-      version == null ||
-      IntStream.range(fileVersion, version.value()).noneMatch(value -> value == this.migration.value())) {
-      return;
-    }
-    this.setValue(null);
-    resolver.setValue(this.path, null, this.genericDeclaration, this);
-  }
-
-  /**
    * a class that represents keys.
    */
   @Getter

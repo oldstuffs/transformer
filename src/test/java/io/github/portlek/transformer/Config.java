@@ -36,6 +36,7 @@ public final class Config extends TransformedObject {
       .withTransformPack(registry -> registry
         .withSerializers(new TestData.Serializer()))
       .initiate();
+    System.out.println(TransformedConfig.testData3);
   }
 
   private static final class HJsonConfigurer extends TransformResolver {
@@ -85,6 +86,12 @@ public final class Config extends TransformedObject {
     @Override
     public boolean pathExists(@NotNull final String path) {
       return this.json.has(path);
+    }
+
+    @Override
+    public void removeValue(@NotNull final String path, @Nullable final GenericDeclaration genericType,
+                            @Nullable final FieldDeclaration field) {
+      this.json.remove(path);
     }
 
     @Override

@@ -37,7 +37,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -122,6 +121,9 @@ public final class TransformedObjectDeclaration {
           .filter(field -> !field.hasAnnotation(Exclude.class))
           .map(field -> FieldDeclaration.of(Names.Calculated.calculateNames(clazz), object, clazz, field))
           .collect(Collectors.toMap(FieldDeclaration::getPath, Function.identity(), (f1, f2) -> {
+            if (f1.getMigration() != null) {
+              return f2;
+            }
             throw new IllegalStateException(String.format("Duplicate key %s", f1));
           }, LinkedHashMap::new)),
         classOf.getAnnotation(Comment.class).orElse(null),
@@ -185,7 +187,7 @@ public final class TransformedObjectDeclaration {
   public Map<String, FieldDeclaration> getNonMigratedFields() {
     return this.fields.entrySet().stream()
       .filter(entry -> entry.getValue().isNotMigrated(this))
-      .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
+      .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
   /**

@@ -107,6 +107,12 @@ public abstract class WrappedTransformResolver extends TransformResolver {
     return this.delegate.pathExists(path);
   }
 
+  @Override
+  public void removeValue(@NotNull final String path, @Nullable final GenericDeclaration genericType,
+                          @Nullable final FieldDeclaration field) {
+    this.delegate.removeValue(path, genericType, field);
+  }
+
   @Nullable
   @Override
   public Object serialize(@Nullable final Object value, @Nullable final GenericDeclaration genericType,

@@ -47,6 +47,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.IntStream;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -595,7 +596,7 @@ public abstract class TransformedObject {
     if (field != null) {
       field.setValue(null);
     }
-    this.resolver.setValue(path, null, field == null ? null : field.getGenericDeclaration(), field);
+    this.resolver.removeValue(path, field == null ? null : field.getGenericDeclaration(), field);
     return this;
   }
 
@@ -789,10 +790,19 @@ public abstract class TransformedObject {
         new TransformException("Something went wrong when getting the version."));
     } else {
       fileVersion = 1;
-      this.set("file-version", 1);
     }
-    this.declaration.getAllFields().forEach((s, fieldDeclaration) ->
-      fieldDeclaration.removeIfMigrated(fileVersion, this.declaration, this.resolver));
+    this.set("file-version", this.declaration.getVersionInteger());
+    this.declaration.getAllFields().forEach((s, fieldDeclaration) -> {
+      final var version = this.declaration.getVersion();
+      final var migration = fieldDeclaration.getMigration();
+      if (migration == null ||
+        migration.value() <= 0 ||
+        version == null ||
+        IntStream.rangeClosed(fileVersion, version.value()).noneMatch(value -> value == migration.value())) {
+        return;
+      }
+      this.remove(fieldDeclaration.getPath());
+    });
     this.declaration.getNonMigratedFields().forEach((key, fieldDeclaration) -> {
       final var fieldPath = fieldDeclaration.getPath();
       final var genericType = fieldDeclaration.getGenericDeclaration();
