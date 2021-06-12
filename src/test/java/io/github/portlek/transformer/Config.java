@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 public final class Config extends TransformedObject {
 
   public static void main(final String[] args) {
-    TransformerPool.create(TransformedConfig.class)
+    final var config = TransformerPool.create(TransformedConfig.class)
       .withFile(Path.of(System.getProperty("user.dir"))
         .resolve("target")
         .resolve("config.hjson"))
@@ -36,6 +36,7 @@ public final class Config extends TransformedObject {
       .withTransformPack(registry -> registry
         .withSerializers(new TestData.Serializer()))
       .initiate();
+    System.out.println(TransformedConfig.testData3);
   }
 
   private static final class HJsonConfigurer extends TransformResolver {
@@ -85,6 +86,12 @@ public final class Config extends TransformedObject {
     @Override
     public boolean pathExists(@NotNull final String path) {
       return this.json.has(path);
+    }
+
+    @Override
+    public void removeValue(@NotNull final String path, @Nullable final GenericDeclaration genericType,
+                            @Nullable final FieldDeclaration field) {
+      this.json.remove(path);
     }
 
     @Override
@@ -143,7 +150,7 @@ public final class Config extends TransformedObject {
 
     private void addComments(@NotNull final JsonValue object, @NotNull final TransformedObjectDeclaration declaration,
                              @Nullable final String path) {
-      final var field = declaration.getFields().get(path);
+      final var field = declaration.getNonMigratedFields().get(path);
       if (object instanceof JsonObject) {
         final var jsonObject = (JsonObject) object;
         if (field == null) {
