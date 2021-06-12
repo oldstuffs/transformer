@@ -26,7 +26,6 @@
 package io.github.portlek.transformer.declarations;
 
 import io.github.portlek.reflection.RefField;
-import io.github.portlek.transformer.TransformResolver;
 import io.github.portlek.transformer.TransformedObject;
 import io.github.portlek.transformer.annotations.Comment;
 import io.github.portlek.transformer.annotations.Migration;
@@ -36,7 +35,6 @@ import io.github.portlek.transformer.exceptions.TransformException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.IntStream;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
