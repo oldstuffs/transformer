@@ -36,6 +36,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * a class that represents transformed data.
@@ -108,7 +109,7 @@ public final class TransformedData {
    * @param cls the cls to add.
    * @param <T> type of the value class.
    */
-  public <T> void add(@NotNull final String path, @NotNull final Object value, @NotNull final Class<T> cls) {
+  public <T> void add(@NotNull final String path, @Nullable final Object value, @NotNull final Class<T> cls) {
     this.serializedMap.put(path, this.resolver.serialize(
       value,
       GenericDeclaration.of(cls),
