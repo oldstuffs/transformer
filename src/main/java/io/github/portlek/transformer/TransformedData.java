@@ -199,6 +199,34 @@ public final class TransformedData {
   }
 
   /**
+   * gets a value from deserialized map.
+   *
+   * @param key the key to get.
+   * @param objectClass the object class to get.
+   * @param defaultValue the default value to get.
+   * @param <T> type of the value.
+   *
+   * @return obtained value.
+   */
+  @NotNull
+  public <T> Optional<T> get(@NotNull final String key, @NotNull final Class<T> objectClass,
+                             @NotNull final T defaultValue) {
+    if (this.canSerialize()) {
+      return Optional.empty();
+    }
+    final var object = this.deserializedMap.get(key);
+    if (object == null) {
+      return Optional.empty();
+    }
+    return Optional.of(this.resolver.deserialize(
+      object,
+      GenericDeclaration.of(object),
+      objectClass,
+      null,
+      defaultValue));
+  }
+
+  /**
    * gets a value from deserialized map as list.
    *
    * @param key the key to get.
