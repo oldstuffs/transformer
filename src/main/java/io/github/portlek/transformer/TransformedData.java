@@ -98,6 +98,9 @@ public final class TransformedData {
    * @param value the value to add.
    */
   public void add(@NotNull final String path, @NotNull final Object value) {
+    if (this.canDeserialize()) {
+      return;
+    }
     this.serializedMap.put(path, this.resolver.serialize(value, null, true));
   }
 
@@ -109,11 +112,11 @@ public final class TransformedData {
    * @param cls the cls to add.
    * @param <T> type of the value class.
    */
-  public <T> void add(@NotNull final String path, @Nullable final Object value, @NotNull final Class<T> cls) {
-    this.serializedMap.put(path, this.resolver.serialize(
-      value,
-      GenericDeclaration.of(cls),
-      true));
+  public <T> void add(@NotNull final String path, @NotNull final Object value, @NotNull final Class<T> cls) {
+    if (this.canDeserialize()) {
+      return;
+    }
+    this.serializedMap.put(path, this.resolver.serialize(value, GenericDeclaration.of(cls), true));
   }
 
   /**
@@ -129,6 +132,9 @@ public final class TransformedData {
   @SuppressWarnings("unchecked")
   public <K, V> void addAsMap(@NotNull final String path, @NotNull final Map<K, V> map,
                               @NotNull final Class<K> keyClass, @NotNull final Class<V> valueClass) {
+    if (this.canDeserialize()) {
+      return;
+    }
     this.serializedMap.put(path, this.resolver.serializeMap(
       (Map<Object, Object>) map,
       GenericDeclaration.of(map.getClass(), keyClass, valueClass),
@@ -145,6 +151,9 @@ public final class TransformedData {
    */
   public <T> void addCollection(@NotNull final String path, @NotNull final Collection<T> collection,
                                 @NotNull final Class<T> elementClass) {
+    if (this.canDeserialize()) {
+      return;
+    }
     this.serializedMap.put(path, this.resolver.serializeCollection(
       collection,
       GenericDeclaration.of(collection.getClass(), elementClass),
@@ -263,6 +272,7 @@ public final class TransformedData {
     if (object == null) {
       return Optional.empty();
     }
+    //noinspection unchecked
     return Optional.of(this.resolver.deserialize(
       object,
       GenericDeclaration.of(object),
@@ -289,6 +299,17 @@ public final class TransformedData {
   @NotNull
   public Map<String, Object> getSerializedMap() {
     return Collections.unmodifiableMap(this.serializedMap);
+  }
+
+  /**
+   * removes the key from {@link #serializedMap}.
+   *
+   * @param key the key to remove.
+   */
+  public void remove(@NotNull final String key) {
+    if (this.canSerialize()) {
+      this.serializedMap.remove(key);
+    }
   }
 
   /**
