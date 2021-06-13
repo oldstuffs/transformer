@@ -97,7 +97,7 @@ public final class TransformedData {
    * @param path the path to add.
    * @param value the value to add.
    */
-  public void add(@NotNull final String path, @NotNull final Object value) {
+  public void add(@NotNull final String path, @Nullable final Object value) {
     this.serializedMap.put(path, this.resolver.serialize(value, null, true));
   }
 
@@ -110,10 +110,7 @@ public final class TransformedData {
    * @param <T> type of the value class.
    */
   public <T> void add(@NotNull final String path, @Nullable final Object value, @NotNull final Class<T> cls) {
-    this.serializedMap.put(path, this.resolver.serialize(
-      value,
-      GenericDeclaration.of(cls),
-      true));
+    this.serializedMap.put(path, this.resolver.serialize(value, GenericDeclaration.of(cls), true));
   }
 
   /**
