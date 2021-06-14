@@ -55,14 +55,12 @@ public abstract class TransformResolver {
    * the current object.
    */
   @Nullable
-  @Getter
   private TransformedObject currentObject;
 
   /**
    * the parent object.
    */
   @Nullable
-  @Getter
   private TransformedObject parentObject;
 
   /**
@@ -72,6 +70,52 @@ public abstract class TransformResolver {
   @Getter
   private TransformRegistry registry = new TransformRegistry()
     .withDefaultTransformers();
+
+  /**
+   * obtains the current object.
+   *
+   * @return current object.
+   */
+  @Nullable
+  public final TransformedObject getCurrentObject() {
+    return this.currentObject;
+  }
+
+  /**
+   * obtains the parent object.
+   *
+   * @return parent object.
+   */
+  @Nullable
+  public final TransformedObject getParentObject() {
+    return this.parentObject;
+  }
+
+  /**
+   * sets the current object.
+   *
+   * @param currentObject the current object to set.
+   *
+   * @return {@code this} for builder chain.
+   */
+  @NotNull
+  public final TransformResolver withCurrentObject(@Nullable final TransformedObject currentObject) {
+    this.currentObject = currentObject;
+    return this;
+  }
+
+  /**
+   * sets the parent object.
+   *
+   * @param parentObject the parent object to set.
+   *
+   * @return {@code this} for builder chain.
+   */
+  @NotNull
+  public final TransformResolver withParentObject(@Nullable final TransformedObject parentObject) {
+    this.parentObject = parentObject;
+    return this;
+  }
 
   /**
    * deserializes the object and converts it into object class.
@@ -479,32 +523,6 @@ public abstract class TransformResolver {
    */
   public abstract void setValue(@NotNull String path, @Nullable Object value, @Nullable GenericDeclaration genericType,
                                 @Nullable FieldDeclaration field);
-
-  /**
-   * sets the current object.
-   *
-   * @param currentObject the current object to set.
-   *
-   * @return {@code this} for builder chain.
-   */
-  @NotNull
-  public TransformResolver withCurrentObject(@Nullable final TransformedObject currentObject) {
-    this.currentObject = currentObject;
-    return this;
-  }
-
-  /**
-   * sets the parent object.
-   *
-   * @param parentObject the parent object to set.
-   *
-   * @return {@code this} for builder chain.
-   */
-  @NotNull
-  public TransformResolver withParentObject(@Nullable final TransformedObject parentObject) {
-    this.parentObject = parentObject;
-    return this;
-  }
 
   /**
    * sets the registry.

@@ -25,7 +25,7 @@ public class TransformedConfig extends TransformedObject {
    * The section contains disabled commands in claims.
    */
   @Comment("The section contains disabled commands in claims.")
-  public static Collection<String> disabledCommandsInClaims = Set.of(
+  public static Set<String> disabledCommandsInClaims = Set.of(
     "sethome");
 
   /**
@@ -34,7 +34,7 @@ public class TransformedConfig extends TransformedObject {
   @Comment(
     "The section contains worlds which are forbidden to create claims in it."
   )
-  public static Collection<String> disabledWorlds = Set.of(
+  public static Set<String> disabledWorlds = Set.of(
     "spawn",
     "lobby");
 

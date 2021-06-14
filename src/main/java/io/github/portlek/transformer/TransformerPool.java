@@ -109,7 +109,7 @@ public final class TransformerPool {
         if (cls == Set.class) {
           return new HashSet<>();
         }
-        if (cls == List.class) {
+        if (cls == List.class || cls == Collection.class) {
           return new ArrayList<>();
         }
         return new ClassOf<>(cls).getConstructor()
