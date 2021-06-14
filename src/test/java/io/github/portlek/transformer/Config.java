@@ -36,7 +36,7 @@ public final class Config extends TransformedObject {
       .withTransformPack(registry -> registry
         .withSerializers(new TestData.Serializer()))
       .initiate();
-    System.out.println(TransformedConfig.Test.test);
+    System.out.println(TransformedConfig.DefaultMessages.enteringMessage);
   }
 
   private static final class HJsonConfigurer extends TransformResolver {
