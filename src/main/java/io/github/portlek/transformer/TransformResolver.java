@@ -428,14 +428,14 @@ public abstract class TransformResolver {
       if (genericType == null) {
         final var valueDeclaration = GenericDeclaration.of(value);
         if (this.isToStringObject(serializerType, valueDeclaration)) {
-          return this.deserialize(value, null, String.class, null, null);
+          return this.deserialize(value, null, String.class, null, value);
         }
       }
       if (this.isToStringObject(serializerType, genericType)) {
-        return this.deserialize(value, genericType, String.class, null, null);
+        return this.deserialize(value, genericType, String.class, null, value);
       }
       if (this.isToListObject(serializerType, genericType)) {
-        return this.deserialize(value, genericType, List.class, GenericDeclaration.ofReady(List.class), null);
+        return this.deserialize(value, genericType, List.class, GenericDeclaration.ofReady(List.class), value);
       }
       if (value instanceof Collection<?>) {
         return this.serializeCollection((Collection<?>) value, genericType, conservative);

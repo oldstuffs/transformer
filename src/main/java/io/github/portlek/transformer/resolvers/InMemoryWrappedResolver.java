@@ -82,14 +82,14 @@ public final class InMemoryWrappedResolver extends WrappedTransformResolver {
   }
 
   @Override
-  public void setValue(@NotNull final String path, @Nullable final Object value,
-                       @Nullable final GenericDeclaration genericType, @Nullable final FieldDeclaration field) {
-    this.map.put(path, value);
-  }
-
-  @Override
   public void removeValue(@NotNull final String path, @Nullable final GenericDeclaration genericType,
                           @Nullable final FieldDeclaration field) {
     this.map.remove(path);
+  }
+
+  @Override
+  public void setValue(@NotNull final String path, @Nullable final Object value,
+                       @Nullable final GenericDeclaration genericType, @Nullable final FieldDeclaration field) {
+    this.map.put(path, value);
   }
 }

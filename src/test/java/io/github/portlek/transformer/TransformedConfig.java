@@ -1,13 +1,9 @@
 package io.github.portlek.transformer;
 
-import io.github.portlek.replaceable.RpList;
 import io.github.portlek.replaceable.RpString;
 import io.github.portlek.transformer.annotations.Comment;
-import io.github.portlek.transformer.annotations.CustomKey;
-import io.github.portlek.transformer.annotations.Migration;
 import io.github.portlek.transformer.annotations.Names;
 import io.github.portlek.transformer.annotations.Version;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
