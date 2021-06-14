@@ -74,58 +74,6 @@ public abstract class TransformResolver {
     .withDefaultTransformers();
 
   /**
-   * sets the current object.
-   *
-   * @param currentObject the current object to set.
-   *
-   * @return {@code this} for builder chain.
-   */
-  @NotNull
-  public final TransformResolver withCurrentObject(@Nullable final TransformedObject currentObject) {
-    this.currentObject = currentObject;
-    return this;
-  }
-
-  /**
-   * sets the parent object.
-   *
-   * @param parentObject the parent object to set.
-   *
-   * @return {@code this} for builder chain.
-   */
-  @NotNull
-  public final TransformResolver withParentObject(@Nullable final TransformedObject parentObject) {
-    this.parentObject = parentObject;
-    return this;
-  }
-
-  /**
-   * sets the registry.
-   *
-   * @param registry the registry to set.
-   *
-   * @return {@code this} for builder chain.
-   */
-  @NotNull
-  public final TransformResolver withRegistry(@NotNull final TransformRegistry registry) {
-    this.registry = registry;
-    return this;
-  }
-
-  /**
-   * registers the pack.
-   *
-   * @param packs the packs to register.
-   *
-   * @return {@code this} for builder chain.
-   */
-  @NotNull
-  public final TransformResolver withTransformerPacks(@NotNull final TransformPack... packs) {
-    this.registry.withTransformPacks(packs);
-    return this;
-  }
-
-  /**
    * deserializes the object and converts it into object class.
    *
    * @param object the object to deserialize.
@@ -531,6 +479,58 @@ public abstract class TransformResolver {
    */
   public abstract void setValue(@NotNull String path, @Nullable Object value, @Nullable GenericDeclaration genericType,
                                 @Nullable FieldDeclaration field);
+
+  /**
+   * sets the current object.
+   *
+   * @param currentObject the current object to set.
+   *
+   * @return {@code this} for builder chain.
+   */
+  @NotNull
+  public TransformResolver withCurrentObject(@Nullable final TransformedObject currentObject) {
+    this.currentObject = currentObject;
+    return this;
+  }
+
+  /**
+   * sets the parent object.
+   *
+   * @param parentObject the parent object to set.
+   *
+   * @return {@code this} for builder chain.
+   */
+  @NotNull
+  public TransformResolver withParentObject(@Nullable final TransformedObject parentObject) {
+    this.parentObject = parentObject;
+    return this;
+  }
+
+  /**
+   * sets the registry.
+   *
+   * @param registry the registry to set.
+   *
+   * @return {@code this} for builder chain.
+   */
+  @NotNull
+  public TransformResolver withRegistry(@NotNull final TransformRegistry registry) {
+    this.registry = registry;
+    return this;
+  }
+
+  /**
+   * registers the pack.
+   *
+   * @param packs the packs to register.
+   *
+   * @return {@code this} for builder chain.
+   */
+  @NotNull
+  public TransformResolver withTransformerPacks(@NotNull final TransformPack... packs) {
+    this.registry.withTransformPacks(packs);
+    return this;
+  }
 
   /**
    * writes the steam.
