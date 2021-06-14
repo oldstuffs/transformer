@@ -791,7 +791,9 @@ public abstract class TransformedObject {
     } else {
       fileVersion = 1;
     }
-    this.set("file-version", this.declaration.getVersionInteger());
+    if (this.resolver.getParentObject() == null) {
+      this.set("file-version", this.declaration.getVersionInteger());
+    }
     this.declaration.getAllFields().forEach((s, fieldDeclaration) -> {
       final var version = this.declaration.getVersion();
       final var migration = fieldDeclaration.getMigration();

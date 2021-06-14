@@ -55,14 +55,12 @@ public abstract class TransformResolver {
    * the current object.
    */
   @Nullable
-  @Getter
   private TransformedObject currentObject;
 
   /**
    * the parent object.
    */
   @Nullable
-  @Getter
   private TransformedObject parentObject;
 
   /**
@@ -72,6 +70,26 @@ public abstract class TransformResolver {
   @Getter
   private TransformRegistry registry = new TransformRegistry()
     .withDefaultTransformers();
+
+  /**
+   * obtains the current object.
+   *
+   * @return current object.
+   */
+  @Nullable
+  public final TransformedObject getCurrentObject() {
+    return this.currentObject;
+  }
+
+  /**
+   * obtains the parent object.
+   *
+   * @return parent object.
+   */
+  @Nullable
+  public final TransformedObject getParentObject() {
+    return this.parentObject;
+  }
 
   /**
    * sets the current object.
@@ -96,32 +114,6 @@ public abstract class TransformResolver {
   @NotNull
   public final TransformResolver withParentObject(@Nullable final TransformedObject parentObject) {
     this.parentObject = parentObject;
-    return this;
-  }
-
-  /**
-   * sets the registry.
-   *
-   * @param registry the registry to set.
-   *
-   * @return {@code this} for builder chain.
-   */
-  @NotNull
-  public final TransformResolver withRegistry(@NotNull final TransformRegistry registry) {
-    this.registry = registry;
-    return this;
-  }
-
-  /**
-   * registers the pack.
-   *
-   * @param packs the packs to register.
-   *
-   * @return {@code this} for builder chain.
-   */
-  @NotNull
-  public final TransformResolver withTransformerPacks(@NotNull final TransformPack... packs) {
-    this.registry.withTransformPacks(packs);
     return this;
   }
 
@@ -531,6 +523,32 @@ public abstract class TransformResolver {
    */
   public abstract void setValue(@NotNull String path, @Nullable Object value, @Nullable GenericDeclaration genericType,
                                 @Nullable FieldDeclaration field);
+
+  /**
+   * sets the registry.
+   *
+   * @param registry the registry to set.
+   *
+   * @return {@code this} for builder chain.
+   */
+  @NotNull
+  public TransformResolver withRegistry(@NotNull final TransformRegistry registry) {
+    this.registry = registry;
+    return this;
+  }
+
+  /**
+   * registers the pack.
+   *
+   * @param packs the packs to register.
+   *
+   * @return {@code this} for builder chain.
+   */
+  @NotNull
+  public TransformResolver withTransformerPacks(@NotNull final TransformPack... packs) {
+    this.registry.withTransformPacks(packs);
+    return this;
+  }
 
   /**
    * writes the steam.

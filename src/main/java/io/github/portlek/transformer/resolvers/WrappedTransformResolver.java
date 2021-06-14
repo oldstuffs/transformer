@@ -25,6 +25,8 @@
 
 package io.github.portlek.transformer.resolvers;
 
+import io.github.portlek.transformer.TransformPack;
+import io.github.portlek.transformer.TransformRegistry;
 import io.github.portlek.transformer.TransformResolver;
 import io.github.portlek.transformer.declarations.FieldDeclaration;
 import io.github.portlek.transformer.declarations.GenericDeclaration;
@@ -52,6 +54,12 @@ public abstract class WrappedTransformResolver extends TransformResolver {
    */
   @NotNull
   private final TransformResolver delegate;
+
+  @NotNull
+  @Override
+  public TransformRegistry getRegistry() {
+    return this.delegate.getRegistry();
+  }
 
   @Nullable
   @Override
@@ -138,6 +146,18 @@ public abstract class WrappedTransformResolver extends TransformResolver {
   public void setValue(@NotNull final String path, @Nullable final Object value,
                        @Nullable final GenericDeclaration genericType, @Nullable final FieldDeclaration field) {
     this.delegate.setValue(path, value, genericType, field);
+  }
+
+  @NotNull
+  @Override
+  public TransformResolver withRegistry(@NotNull final TransformRegistry registry) {
+    return this.delegate.withRegistry(registry);
+  }
+
+  @NotNull
+  @Override
+  public TransformResolver withTransformerPacks(@NotNull final TransformPack... packs) {
+    return this.delegate.withTransformerPacks(packs);
   }
 
   @Override
