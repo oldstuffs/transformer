@@ -1,5 +1,6 @@
 package io.github.portlek.transformer;
 
+import io.github.portlek.replaceable.RpString;
 import io.github.portlek.transformer.declarations.GenericDeclaration;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -22,7 +23,7 @@ public final class TestData {
   private final int number;
 
   @NotNull
-  private final String test;
+  private final RpString test;
 
   public static final class Serializer implements ObjectSerializer<TestData> {
 
@@ -40,12 +41,12 @@ public final class TestData {
       return Optional.of(new TestData(
         field.getConsumer(),
         transformedData.get("number", int.class).orElseThrow(),
-        transformedData.get("test", String.class).orElseThrow()));
+        transformedData.get("test", RpString.class, field.getTest()).orElseThrow()));
     }
 
     @Override
     public void serialize(@NotNull final TestData testData, @NotNull final TransformedData transformedData) {
-      transformedData.add("test", testData.getTest());
+      transformedData.add("test", testData.getTest(), RpString.class);
       transformedData.add("number", testData.getNumber());
     }
 
