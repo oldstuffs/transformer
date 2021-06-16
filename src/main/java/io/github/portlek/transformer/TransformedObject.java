@@ -55,7 +55,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * an abstract class that represents transformed objects.
  */
-public abstract class TransformedObject {
+public abstract class TransformedObject implements Transformed {
 
   /**
    * the declaration.
@@ -332,6 +332,7 @@ public abstract class TransformedObject {
    *
    * @return all keys.
    */
+  @Override
   @NotNull
   public final List<String> getAllKeys() {
     return new ArrayList<>(Objects.requireNonNull(this.declaration, "declaration").getNonMigratedFields().keySet());
@@ -781,7 +782,7 @@ public abstract class TransformedObject {
     Objects.requireNonNull(this.declaration, "declaration");
     Objects.requireNonNull(this.resolver, "resolver");
     Optional.ofNullable(this.resolver.getParentObject())
-      .map(TransformedObject::getDeclaration)
+      .map(Transformed::getDeclaration)
       .map(TransformedObjectDeclaration::getVersion)
       .ifPresent(this.declaration::setVersion);
     final int fileVersion;
@@ -864,43 +865,6 @@ public abstract class TransformedObject {
   @NotNull
   public final TransformedObject withDeclaration(@NotNull final TransformedObjectDeclaration declaration) {
     this.declaration = declaration;
-    return this;
-  }
-
-  /**
-   * sets the {@link #path}.
-   *
-   * @param file the file to set.
-   *
-   * @return {@code this} for builder chain.
-   */
-  @NotNull
-  public final TransformedObject withFile(@NotNull final File file) {
-    return this.withFile(file.toPath());
-  }
-
-  /**
-   * sets the {@link #path}.
-   *
-   * @param path the path to set.
-   *
-   * @return {@code this} for builder chain.
-   */
-  @NotNull
-  public final TransformedObject withFile(@NotNull final String path) {
-    return this.withFile(Path.of(path));
-  }
-
-  /**
-   * sets the {@link #path}.
-   *
-   * @param path the path to set.
-   *
-   * @return {@code this} for builder chain.
-   */
-  @NotNull
-  public final TransformedObject withFile(@NotNull final Path path) {
-    this.path = path;
     return this;
   }
 

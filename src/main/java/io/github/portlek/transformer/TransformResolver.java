@@ -55,13 +55,13 @@ public abstract class TransformResolver {
    * the current object.
    */
   @Nullable
-  private TransformedObject currentObject;
+  private Transformed currentObject;
 
   /**
    * the parent object.
    */
   @Nullable
-  private TransformedObject parentObject;
+  private Transformed parentObject;
 
   /**
    * the registry.
@@ -77,7 +77,7 @@ public abstract class TransformResolver {
    * @return current object.
    */
   @Nullable
-  public final TransformedObject getCurrentObject() {
+  public final Transformed getCurrentObject() {
     return this.currentObject;
   }
 
@@ -87,7 +87,7 @@ public abstract class TransformResolver {
    * @return parent object.
    */
   @Nullable
-  public final TransformedObject getParentObject() {
+  public final Transformed getParentObject() {
     return this.parentObject;
   }
 
@@ -99,7 +99,7 @@ public abstract class TransformResolver {
    * @return {@code this} for builder chain.
    */
   @NotNull
-  public final TransformResolver withCurrentObject(@Nullable final TransformedObject currentObject) {
+  public final TransformResolver withCurrentObject(@Nullable final Transformed currentObject) {
     this.currentObject = currentObject;
     return this;
   }
@@ -112,7 +112,7 @@ public abstract class TransformResolver {
    * @return {@code this} for builder chain.
    */
   @NotNull
-  public final TransformResolver withParentObject(@Nullable final TransformedObject parentObject) {
+  public final TransformResolver withParentObject(@Nullable final Transformed parentObject) {
     this.parentObject = parentObject;
     return this;
   }
